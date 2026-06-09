@@ -6,6 +6,7 @@ import { TopologyTemplates } from "../graph/TopologyTemplates";
 import { TaskIntentClassifier } from "../product/TaskIntentClassifier";
 import { AutoTopologySelector } from "../product/AutoTopologySelector";
 import { PROVIDERS } from "../product/ProviderRegistry";
+import { MemoryManager } from "../memory/MemoryManager";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -13,7 +14,7 @@ const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
 // Known commands (not task descriptions)
-const KNOWN_CMDS = ["setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
+const KNOWN_CMDS = ["memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
 
 async function main() {
   const broker = new Broker();
@@ -46,6 +47,8 @@ async function main() {
     case "version": return cmdVersion();
     case "health": return cmdHealth(broker);
     case "history": return cmdHistory(broker, ARGS);
+    case "memory": return cmdMemory(ARGS);
+    case "project": return cmdProject(ARGS);
     case "help": return printUsage();
     default: printUsage();
   }
@@ -301,6 +304,73 @@ function cmdHistory(broker: Broker, args: string[]) {
     if (all.length === 0) { console.log("  No revision history."); return; }
     console.log(`\n  Revision History (${all.length} records):\n`);
     for (const r of all) console.log(`    ${r.taskId} #${r.attempt} ${r.decision} (score=${r.score})`);
+  }
+}
+
+async function cmdMemory(args: string[]) {
+  const mm = new MemoryManager();
+  const sub = args[1];
+
+  if (sub === "list") {
+    const tasks = mm.listTaskMemories();
+    const projects = mm.listProjects();
+    console.log(`\n  🐝 Memory\n`);
+    console.log(`  Tasks: ${tasks.length}`);
+    console.log(`  Projects: ${projects.length}`);
+    tasks.forEach(t => console.log(`    ${t.taskId}: ${t.goal.slice(0, 60)}`));
+    projects.forEach(p => console.log(`    ${p.project}: ${p.techStack.join(", ")}`));
+  } else if (sub === "show" && args[2]) {
+    const proj = mm.getProjectMemory(args[2]);
+    if (proj) {
+      console.log(`\n  Project: ${proj.project}`);
+      console.log(`  Stack: ${proj.techStack.join(", ")}`);
+      console.log(`  Issues: ${proj.knownIssues.join(", ") || "none"}`);
+      console.log(`  Patterns: ${proj.patterns.join(", ") || "none"}`);
+    } else {
+      console.log(`  Project "${args[2]}" not found`);
+    }
+  } else if (sub === "search" && args[2]) {
+    const results = mm.searchMemories(args.slice(2).join(" "));
+    console.log(`\n  🐝 Search: "${args.slice(2).join(" ")}"\n`);
+    results.forEach(r => console.log(`  ${r.type}/${r.name}: ${r.matches.join(", ")}`));
+    if (results.length === 0) console.log("  No results");
+  } else {
+    console.log("\n  Usage: hive memory [list|show <name>|search <query>]\n");
+  }
+}
+
+function cmdProject(args: string[]) {
+  const mm = new MemoryManager();
+  const sub = args[1];
+
+  if (sub === "init" && args[2]) {
+    const name = args[2];
+    mm.saveProjectMemory({
+      project: name,
+      techStack: args.slice(3),
+      architecture: [],
+      knownIssues: [],
+      patterns: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    console.log(`\n  ✓ Project "${name}" initialized\n`);
+  } else if (sub === "list") {
+    const projects = mm.listProjects();
+    console.log(`\n  🐝 Projects\n`);
+    projects.forEach(p => console.log(`    ${p.project}: ${p.techStack.join(", ") || "no stack"}`));
+    if (projects.length === 0) console.log("    No projects. Run: hive project init <name>");
+  } else if (sub === "info" && args[2]) {
+    const proj = mm.getProjectMemory(args[2]);
+    if (proj) {
+      console.log(`\n  Project: ${proj.project}`);
+      console.log(`  Stack: ${proj.techStack.join(", ")}`);
+      console.log(`  Created: ${proj.createdAt}`);
+    } else {
+      console.log(`  Project "${args[2]}" not found`);
+    }
+  } else {
+    console.log("\n  Usage: hive project [init <name> [stack...]|list|info <name>]\n");
   }
 }
 

@@ -1,11 +1,17 @@
-# Agent Hive
+# 🐝 Agent Hive
 
-### Run Claude, Codex, Gemini and other AI agents as one team.
+[English](README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [Español](README.es.md)
+
+**One task. Multiple AI minds.**
+
+Claude writes. GPT reviews. Gemini plans.
+
+Agent Hive lets multiple AI models collaborate on the same task automatically.
 
 ```bash
-npm install -g agent-hive
+npm install -g agenthive
 hive setup
-hive
+hive "build a SaaS landing page"
 ```
 
 ```
@@ -14,11 +20,9 @@ hive
 What do you want to build?
 > Build a SaaS landing page
 
-✓ codex → claude (simpleChain)
+[select] codex → claude (simpleChain)
 ✓ COMPLETED — score: 95, revisions: 0
 ```
-
-That's it. One command. Auto-everything.
 
 ---
 
@@ -26,9 +30,9 @@ That's it. One command. Auto-everything.
 
 ```bash
 # Install
-npm install -g agent-hive
+npm install -g agenthive
 
-# Configure (interactive — picks provider, discovers models)
+# Configure (pick provider, auto-discovers models)
 hive setup
 
 # Run
@@ -39,95 +43,42 @@ hive "Build a REST API for users"
 
 | Single Agent | Agent Hive |
 |---|---|
-| Write + self-review | Write + independent review |
-| Miss own bugs | Second set of eyes |
-| One model's perspective | Multi-runtime collaboration |
+| Writes + self-reviews | Writes + independent review |
+| Misses own bugs | Second set of eyes |
+| One model's perspective | Multi-model collaboration |
 
 ## What It Does
 
-1. **Classify** — understands your task intent
-2. **Select** — picks the best executor + reviewer
-3. **Execute** — executor writes the code
+1. **Classify** — understands your task
+2. **Select** — picks best executor + reviewer
+3. **Execute** — executor writes code
 4. **Review** — reviewer evaluates independently
-5. **Revise** — if issues found, loops until pass
-
-## Supported Providers
-
-OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · Custom
-
-## Supported Runtimes
-
-| Runtime | Best For |
-|---|---|
-| Codex | Coding, Refactor |
-| Claude | Review, Architecture |
-| Hermes | Planning, Research |
-| OpenClaw | Security, Code Analysis |
+5. **Revise** — loops until pass
 
 ## Commands
 
 | Command | Description |
 |---|---|
 | `hive` | Interactive mode |
-| `hive "task"` | Run a task directly |
-| `hive setup` | Configure provider & model |
-| `hive doctor` | Check system health |
-| `hive dashboard` | Generate visual dashboard |
-| `hive version` | Show version |
+| `hive "task"` | Run a task |
+| `hive setup` | Configure provider |
+| `hive doctor` | Check health |
+| `hive memory list` | View memories |
+| `hive project list` | View projects |
+| `hive dashboard` | Visual dashboard |
 
-## Architecture
+## Supported Providers
 
-```
-You → hive "task" → Intent Classifier → Auto Selector
-                                              ↓
-                    Executor (codex/claude/hermes) → Reviewer
-                                              ↓
-                                        Revision Loop
-                                              ↓
-                                        ✓ Done
-```
+OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · Any OpenAI-compatible API
 
-## Observability
+## Memory System
+
+Agent Hive remembers your projects:
 
 ```bash
-hive dashboard    # generates HTML dashboard
-hive history      # view revision history
-```
-
-## Benchmark
-
-```
-         Coding  Review  Planning  Reasoning
-Codex      97      88       82        90
-Claude     92      96       94        95
-Hermes     80      90       96        92
-```
-
-## FAQ
-
-**Q: Do I need multiple API keys?**
-A: No. One key works for all runtimes.
-
-**Q: What if I only have one provider?**
-A: Works fine. Each runtime uses the same provider.
-
-**Q: Is it free?**
-A: Agent Hive is free (MIT). You pay for API usage.
-
-## Roadmap
-
-- [x] v1.0 — Multi-runtime orchestration
-- [ ] v1.1 — Interactive mode, provider registry
-- [ ] v1.2 — Tool use (file writing, code execution)
-- [ ] v2.0 — Multi-model (different models per runtime)
-
-## Contributing
-
-```bash
-git clone https://github.com/toyako/agent-hive.git
-cd agent-hive
-npm install && npm run build
-node dist/commands/test-graph.js  # run tests
+hive project init my-app typescript postgres
+hive "add user authentication"
+hive memory search auth  # finds past decisions
 ```
 
 ## License

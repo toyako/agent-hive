@@ -1,39 +1,24 @@
-# Agent Hive
+# 🐝 Agent Hive
 
-[English](README.md) | **中文**
+[English](README.md) | **中文** | [日本語](README.ja.md) | [Español](README.es.md)
 
-### 让 Claude、Codex、Gemini 等 AI 代理像一个团队一样协作。
+**一个任务。多个 AI 大脑。**
+
+Claude 写代码。GPT 审查。Gemini 规划。
+
+Agent Hive 让多个 AI 模型自动协作完成同一个任务。
 
 ```bash
-npm install -g agent-hive
+npm install -g agenthive
 hive setup
-hive
+hive "构建一个 SaaS 落地页"
 ```
-
-```
-🐝 Agent Hive
-
-你想构建什么？
-> 构建一个 SaaS 落地页
-
-✓ codex → claude (simpleChain)
-✓ 完成 — 评分: 95, 修订次数: 0
-```
-
-一条命令，全自动。
-
----
 
 ## 快速开始
 
 ```bash
-# 安装
-npm install -g agent-hive
-
-# 配置（交互式 — 选择供应商，自动发现模型）
+npm install -g agenthive
 hive setup
-
-# 运行
 hive "构建一个用户 CRUD API"
 ```
 
@@ -43,29 +28,18 @@ hive "构建一个用户 CRUD API"
 |---|---|
 | 写代码 + 自我审查 | 写代码 + 独立审查 |
 | 容易遗漏自己的错误 | 第二双眼睛 |
-| 单一模型视角 | 多运行时协作 |
-
-## 工作原理
-
-1. **分类** — 理解任务意图
-2. **选择** — 挑选最佳执行者 + 审查者
-3. **执行** — 执行者编写代码
-4. **审查** — 审查者独立评估
-5. **修订** — 发现问题则循环直到通过
-
-## 支持的供应商
-
-OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · 自定义
+| 单一模型视角 | 多模型协作 |
 
 ## 命令
 
 | 命令 | 说明 |
 |---|---|
 | `hive` | 交互模式 |
-| `hive "任务"` | 直接运行任务 |
-| `hive setup` | 配置供应商和模型 |
-| `hive doctor` | 检查系统健康 |
-| `hive dashboard` | 生成可视化面板 |
+| `hive "任务"` | 运行任务 |
+| `hive setup` | 配置供应商 |
+| `hive doctor` | 健康检查 |
+| `hive memory list` | 查看记忆 |
+| `hive project list` | 查看项目 |
 
 ## 许可证
 

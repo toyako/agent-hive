@@ -1,5 +1,5 @@
 {
-  "name": "agent-hive",
+  "name": "agenthive",
   "version": "1.0.0",
   "description": "Multi-Runtime Agent Orchestration Framework",
   "main": "dist/commands/cli.js",
