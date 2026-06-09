@@ -5,14 +5,29 @@ import { GraphValidator } from "../graph/GraphValidator";
 import { TopologyTemplates } from "../graph/TopologyTemplates";
 import { TaskIntentClassifier } from "../product/TaskIntentClassifier";
 import { AutoTopologySelector } from "../product/AutoTopologySelector";
+import { PROVIDERS } from "../product/ProviderRegistry";
 import * as fs from "fs";
 import * as path from "path";
 
 const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
+// Known commands (not task descriptions)
+const KNOWN_CMDS = ["setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
+
 async function main() {
   const broker = new Broker();
+
+  // No args → interactive mode
+  if (!CMD) {
+    return cmdInteractive(broker);
+  }
+
+  // First arg looks like a task (not a known command) → treat as shortcut
+  if (!KNOWN_CMDS.includes(CMD)) {
+    const task = ARGS.join(" ");
+    return cmdRunWithTask(broker, task);
+  }
 
   switch (CMD) {
     case "setup": return cmdSetup();
@@ -33,6 +48,57 @@ async function main() {
     case "history": return cmdHistory(broker, ARGS);
     case "help": return printUsage();
     default: printUsage();
+  }
+}
+
+async function cmdInteractive(broker: Broker) {
+  const readline = require("readline");
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q: string) => new Promise<string>(resolve => rl.question(q, resolve));
+
+  console.log("\n  🐝 Agent Hive\n");
+  const task = await ask("  What do you want to build?\n\n  > ");
+  rl.close();
+
+  if (!task.trim()) {
+    console.log("  Bye! 🐝\n");
+    return;
+  }
+
+  await cmdRunWithTask(broker, task);
+}
+
+async function cmdRunWithTask(broker: Broker, task: string) {
+  cleanTasks();
+  console.log(`\n  🐝 Working on: "${task.slice(0, 80)}${task.length > 80 ? "..." : ""}"\n`);
+  await cmdDetect(broker, []);
+
+  // Auto-classify and select
+  const classifier = new TaskIntentClassifier();
+  const adapters = broker.registry.all().map(e => broker.registry.getAdapter(e.name)!).filter(Boolean);
+  const selector = new AutoTopologySelector(adapters);
+  const classification = classifier.classify(task);
+  const selection = selector.select(classification.intent);
+
+  console.log(`  [classify] ${classification.intent} (${classification.confidence})`);
+  console.log(`  [select]   ${selection.executor} → ${selection.reviewer} (${selection.topology})\n`);
+
+  broker.addAgentProfile({ id: selection.executor, runtimeId: selection.executor, role: "executor", maxConcurrency: 1, status: "idle" });
+  broker.addAgentProfile({ id: selection.reviewer, runtimeId: selection.reviewer, role: "reviewer", maxConcurrency: 1, status: "idle" });
+  broker.addGraphEdge(selection.executor, selection.reviewer, "reviews", 10);
+  broker.addGraphEdge(selection.reviewer, selection.executor, "escalates", 5);
+  broker.enableGraphMode();
+
+  broker.submit({ instruction: task, executor: selection.executor, reviewer: selection.reviewer, workingDirectory: process.cwd(), maxRevision: 3 });
+  await broker.run();
+
+  const tasks = broker.listTasks();
+  if (tasks.length > 0) {
+    const t = tasks[0];
+    const history = broker.history.get(t.id);
+    const lastReview = history[history.length - 1];
+    const icon = t.status === "COMPLETED" ? "✓" : "✗";
+    console.log(`  ${icon} ${t.status} — score: ${lastReview?.score || "N/A"}, revisions: ${t.revisionCount}\n`);
   }
 }
 
@@ -243,38 +309,42 @@ async function cmdSetup() {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const ask = (q: string) => new Promise<string>(resolve => rl.question(q, resolve));
 
-  console.log("\n  🐝 Welcome to Agent Hive Setup\n");
+  console.log("\n  🐝 Welcome to Agent Hive\n");
 
-  const baseUrl = await ask("  Base URL (e.g., https://api.openai.com/v1): ");
+  // Step 1: Choose provider
+  console.log("  Choose Provider:\n");
+  PROVIDERS.forEach((p, i) => console.log(`    ${i + 1}. ${p.name}`));
+  const choice = await ask("\n  > ");
+  const providerIdx = parseInt(choice) - 1;
+  const provider = PROVIDERS[providerIdx] || PROVIDERS[0];
+
+  // Step 2: Base URL
+  const baseUrl = provider.baseUrl || await ask(`  Base URL: `);
+
+  // Step 3: API Key
   const apiKey = await ask("  API Key: ");
 
-  console.log("\n  Probing available models...");
-
-  // Try to fetch models
+  // Step 4: Auto-discover models
+  console.log("\n  Connecting...");
   let models: string[] = [];
   try {
-    const res = await fetch(`${baseUrl}/models`, {
-      headers: { "Authorization": `Bearer ${apiKey}` },
-    });
+    const res = await fetch(`${baseUrl}/models`, { headers: { "Authorization": `Bearer ${apiKey}` } });
     if (res.ok) {
       const data = await res.json() as any;
       models = (data.data || []).map((m: any) => m.id).slice(0, 10);
+      console.log(`  ✓ Connected — ${models.length} models found`);
     }
-  } catch {}
+  } catch { console.log("  ✗ Could not discover models"); }
 
-  let model = "gpt-4";
+  // Step 5: Choose model
+  let model = provider.defaultModel;
   if (models.length > 0) {
-    console.log("\n  Available models:");
+    console.log("\n  Choose Default Model:\n");
     models.forEach((m, i) => console.log(`    ${i + 1}. ${m}`));
-    const choice = await ask("\n  Select model (number or name): ");
-    const idx = parseInt(choice) - 1;
-    if (idx >= 0 && idx < models.length) {
-      model = models[idx];
-    } else if (choice) {
-      model = choice;
-    }
-  } else {
-    model = await ask("  Model name (e.g., gpt-4): ") || "gpt-4";
+    const modelChoice = await ask("\n  > ");
+    const modelIdx = parseInt(modelChoice) - 1;
+    if (modelIdx >= 0 && modelIdx < models.length) model = models[modelIdx];
+    else if (modelChoice) model = modelChoice;
   }
 
   rl.close();
@@ -282,33 +352,19 @@ async function cmdSetup() {
   // Save config
   const configDir = path.resolve(process.cwd(), ".agent-hive");
   fs.mkdirSync(configDir, { recursive: true });
+  fs.writeFileSync(path.join(configDir, "config.json"), JSON.stringify({ provider: provider.name.toLowerCase(), baseUrl, apiKey, model }, null, 2));
 
-  const config = {
-    provider: "openai-compatible",
-    baseUrl,
-    apiKey,
-    model,
-  };
-  fs.writeFileSync(path.join(configDir, "config.json"), JSON.stringify(config, null, 2));
-
-  // Also update runtime.json for backward compatibility
+  // Also write runtime.json for adapter compatibility
   const runtimeConfig: any = {};
   for (const name of ["codex", "claude", "hermes"]) {
-    runtimeConfig[name] = {
-      binary: "openai-sdk",
-      model,
-      env: {
-        OPENAI_API_KEY: apiKey,
-        OPENAI_BASE_URL: baseUrl,
-      },
-    };
+    runtimeConfig[name] = { binary: "openai-sdk", model, env: { OPENAI_API_KEY: apiKey, OPENAI_BASE_URL: baseUrl } };
   }
   fs.writeFileSync("runtime.json", JSON.stringify(runtimeConfig, null, 2));
 
-  console.log(`\n  ✓ Configuration saved to .agent-hive/config.json`);
-  console.log(`  ✓ Runtime config saved to runtime.json`);
+  console.log(`\n  ✓ Setup complete!`);
+  console.log(`  ✓ Provider: ${provider.name}`);
   console.log(`  ✓ Model: ${model}`);
-  console.log(`\n  Run: hive run --task "your first task"\n`);
+  console.log(`\n  Try it: hive "Build a hello world function"\n`);
 }
 
 function cmdVersion() {
@@ -321,46 +377,60 @@ function cmdVersion() {
 }
 
 async function cmdDoctor(broker: Broker) {
-  console.log("\n  Agent Hive Doctor\n");
+  console.log("\n  🐝 Agent Hive Doctor\n");
+  let allOk = true;
 
-  // 1. Check .agent-hive directory
-  const base = path.resolve(process.cwd(), ".hive");
-  const requiredDirs = ["tasks", "messages", "logs", "memory", "history", "conversations", "traces", "metrics", "benchmark", "reports"];
-  let dirOk = true;
-  for (const d of requiredDirs) {
-    const exists = fs.existsSync(path.join(base, d));
-    if (!exists) { console.log(`  ✗ Missing: .hive/${d}`); dirOk = false; }
+  // 1. Config
+  const configPath = path.resolve(process.cwd(), ".agent-hive/config.json");
+  if (fs.existsSync(configPath)) {
+    console.log("  ✓ Config Found");
+  } else {
+    console.log("  ❌ Config Missing — run: hive setup");
+    allOk = false;
   }
-  if (dirOk) console.log("  ✓ .agent-hive directory structure OK");
 
-  // 2. Check runtime.json
+  // 2. Runtime.json
   const runtimePath = path.resolve(process.cwd(), "runtime.json");
   if (fs.existsSync(runtimePath)) {
     const runtime = JSON.parse(fs.readFileSync(runtimePath, "utf-8"));
-    const runtimes = Object.keys(runtime);
-    console.log(`  ✓ runtime.json found (${runtimes.join(", ")})`);
-
-    // Check API keys
     for (const [name, cfg] of Object.entries(runtime)) {
       const r = cfg as any;
       const hasKey = r.env?.OPENAI_API_KEY || r.env?.ANTHROPIC_API_KEY;
-      console.log(`    ${hasKey ? "✓" : "✗"} ${name}: API key ${hasKey ? "configured" : "MISSING"}`);
+      if (!hasKey) { console.log(`  ❌ ${name}: API Key Missing`); allOk = false; }
     }
   } else {
-    console.log("  ✗ runtime.json not found");
+    console.log("  ❌ runtime.json Missing — run: hive setup");
+    allOk = false;
   }
 
-  // 3. Detect runtimes
-  console.log("\n  Runtime Detection:\n");
-  await cmdDetect(broker, []);
+  // 3. API Reachable
+  if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    try {
+      const res = await fetch(`${config.baseUrl}/models`, { headers: { "Authorization": `Bearer ${config.apiKey}` }, signal: AbortSignal.timeout(5000) } as any);
+      if (res.ok) console.log("  ✓ API Reachable");
+      else { console.log(`  ❌ API Unreachable (${res.status})`); allOk = false; }
+    } catch { console.log("  ❌ API Unreachable"); allOk = false; }
+  }
 
-  // 4. Summary
-  console.log("\n  ┌─────────────────────────────────────┐");
-  console.log("  │ Doctor Summary                       │");
-  console.log("  ├─────────────────────────────────────┤");
-  console.log(`  │ Directories: ${dirOk ? "✓ OK" : "✗ Missing"}              │`);
-  console.log(`  │ Runtimes:    ${broker.registry.all().length} detected             │`);
-  console.log("  └─────────────────────────────────────┘\n");
+  // 4. Directory structure
+  const base = path.resolve(process.cwd(), ".agent-hive");
+  const requiredDirs = ["tasks", "traces", "metrics", "reports"];
+  let dirOk = true;
+  for (const d of requiredDirs) {
+    if (!fs.existsSync(path.join(base, d))) { dirOk = false; }
+  }
+  if (dirOk) console.log("  ✓ Directory Structure OK");
+  else { console.log("  ❌ Directory Missing — run: hive init"); allOk = false; }
+
+  // 5. Runtime Detection
+  await cmdDetect(broker, []);
+  const installed = broker.registry.all().filter(e => e.installed);
+  if (installed.length > 0) console.log(`  ✓ ${installed.length} Runtime(s) Healthy`);
+  else { console.log("  ❌ No Runtimes Detected"); allOk = false; }
+
+  // Summary
+  console.log(`\n  ${allOk ? "✓ All checks passed!" : "❌ Some checks failed — see above"}\n`);
 }
 
 async function cmdHealth(broker: Broker) {
