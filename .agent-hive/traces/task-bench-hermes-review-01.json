@@ -1,0 +1,37 @@
+{
+  "taskId": "bench-hermes-review-01",
+  "status": "COMPLETED",
+  "events": [
+    {
+      "type": "created",
+      "timestamp": 1780983561328
+    },
+    {
+      "type": "benchmark-start",
+      "timestamp": 1780983561331,
+      "data": {
+        "runtime": "hermes",
+        "case": "review-01"
+      }
+    },
+    {
+      "type": "benchmark-done",
+      "timestamp": 1780983561334,
+      "data": {
+        "success": true,
+        "score": 20,
+        "latencyMs": 0
+      }
+    },
+    {
+      "type": "completed",
+      "timestamp": 1780983561338,
+      "data": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "startedAt": 1780983561328,
+  "completedAt": 1780983561338,
+  "durationMs": 10
+}

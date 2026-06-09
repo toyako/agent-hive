@@ -1,0 +1,341 @@
+{
+  "timestamp": "2026-06-07T05:04:29.591Z",
+  "fixed": {
+    "successRate": 100,
+    "avgLatency": 111.35,
+    "avgReviewScore": 88
+  },
+  "intelligence": {
+    "successRate": 100,
+    "avgLatency": 101.35,
+    "avgReviewScore": 88
+  },
+  "compositeImprovement": 2.6942074539739562,
+  "taskCount": 20,
+  "details": {
+    "fixed": [
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 122,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 122,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 122,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 123,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 122,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 81,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 81,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 80,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 81,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 82,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 122,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 121,
+        "reviewScore": 88,
+        "selectedBy": "fixed"
+      }
+    ],
+    "intelligence": [
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 50,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 150,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 151,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 80,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 80,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 80,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "review",
+        "runtime": "claude",
+        "success": true,
+        "latencyMs": 80,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "hermes",
+        "success": true,
+        "latencyMs": 31,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "hermes",
+        "success": true,
+        "latencyMs": 31,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "hermes",
+        "success": true,
+        "latencyMs": 29,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "hermes",
+        "success": true,
+        "latencyMs": 30,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 150,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "coding",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 150,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "refactor",
+        "runtime": "codex",
+        "success": true,
+        "latencyMs": 150,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      },
+      {
+        "taskType": "planning",
+        "runtime": "hermes",
+        "success": true,
+        "latencyMs": 30,
+        "reviewScore": 88,
+        "selectedBy": "intelligence"
+      }
+    ]
+  }
+}

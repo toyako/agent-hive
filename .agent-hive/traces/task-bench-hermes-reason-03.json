@@ -1,0 +1,37 @@
+{
+  "taskId": "bench-hermes-reason-03",
+  "status": "COMPLETED",
+  "events": [
+    {
+      "type": "created",
+      "timestamp": 1780983561440
+    },
+    {
+      "type": "benchmark-start",
+      "timestamp": 1780983561442,
+      "data": {
+        "runtime": "hermes",
+        "case": "reason-03"
+      }
+    },
+    {
+      "type": "benchmark-done",
+      "timestamp": 1780983561445,
+      "data": {
+        "success": true,
+        "score": 30,
+        "latencyMs": 0
+      }
+    },
+    {
+      "type": "completed",
+      "timestamp": 1780983561447,
+      "data": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "startedAt": 1780983561440,
+  "completedAt": 1780983561447,
+  "durationMs": 7
+}

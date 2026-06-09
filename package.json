@@ -1,0 +1,30 @@
+{
+  "name": "agent-hive",
+  "version": "1.0.0",
+  "description": "Multi-Runtime Agent Orchestration Framework",
+  "main": "dist/commands/cli.js",
+  "bin": {
+    "hive": "./dist/commands/cli.js"
+  },
+  "scripts": {
+    "build": "tsc && cp -r src/prompts dist/prompts",
+    "start": "node dist/commands/cli.js",
+    "demo": "node dist/commands/demo.js"
+  },
+  "keywords": [
+    "agent",
+    "mesh",
+    "broker",
+    "orchestration"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3",
+    "xstate": "^5.20.0"
+  },
+  "dependencies": {
+    "openai": "^6.42.0"
+  }
+}

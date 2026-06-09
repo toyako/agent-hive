@@ -1,0 +1,37 @@
+{
+  "taskId": "bench-claude-plan-03",
+  "status": "COMPLETED",
+  "events": [
+    {
+      "type": "created",
+      "timestamp": 1780983561222
+    },
+    {
+      "type": "benchmark-start",
+      "timestamp": 1780983561225,
+      "data": {
+        "runtime": "claude",
+        "case": "plan-03"
+      }
+    },
+    {
+      "type": "benchmark-done",
+      "timestamp": 1780983561227,
+      "data": {
+        "success": true,
+        "score": 0,
+        "latencyMs": 0
+      }
+    },
+    {
+      "type": "completed",
+      "timestamp": 1780983561230,
+      "data": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "startedAt": 1780983561222,
+  "completedAt": 1780983561230,
+  "durationMs": 8
+}

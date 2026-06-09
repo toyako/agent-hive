@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.agent-mesh/
+dashboard/
+artifacts/
+reports/
+runtime.json
+run-validation.js
+*.log
+.env
+.env.*

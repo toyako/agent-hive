@@ -1,0 +1,37 @@
+{
+  "taskId": "bench-codex-code-04",
+  "status": "COMPLETED",
+  "events": [
+    {
+      "type": "created",
+      "timestamp": 1780983561614
+    },
+    {
+      "type": "benchmark-start",
+      "timestamp": 1780983561617,
+      "data": {
+        "runtime": "codex",
+        "case": "code-04"
+      }
+    },
+    {
+      "type": "benchmark-done",
+      "timestamp": 1780983561620,
+      "data": {
+        "success": true,
+        "score": 60,
+        "latencyMs": 0
+      }
+    },
+    {
+      "type": "completed",
+      "timestamp": 1780983561622,
+      "data": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "startedAt": 1780983561614,
+  "completedAt": 1780983561622,
+  "durationMs": 8
+}

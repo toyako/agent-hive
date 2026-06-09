@@ -1,0 +1,32 @@
+{
+  "codex": {
+    "runtimeId": "codex",
+    "coding": 97,
+    "review": 88,
+    "planning": 82,
+    "reasoning": 90,
+    "latency": 1500,
+    "successRate": 1,
+    "updatedAt": 1780983561472
+  },
+  "claude": {
+    "runtimeId": "claude",
+    "coding": 92,
+    "review": 96,
+    "planning": 94,
+    "reasoning": 95,
+    "latency": 3000,
+    "successRate": 1,
+    "updatedAt": 1780983561475
+  },
+  "hermes": {
+    "runtimeId": "hermes",
+    "coding": 80,
+    "review": 90,
+    "planning": 96,
+    "reasoning": 92,
+    "latency": 2000,
+    "successRate": 1,
+    "updatedAt": 1780983561477
+  }
+}
