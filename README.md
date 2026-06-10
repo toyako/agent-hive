@@ -1,85 +1,116 @@
-# 🐝 Agent Hive
-
-[English](README.md) | [中文](README.zh-CN.md) | [日本語](README.ja.md) | [Español](README.es.md)
+# Agent Hive
 
 **One task. Multiple AI minds.**
 
-Claude writes. GPT reviews. Gemini plans.
+Claude writes. Codex reviews. Hermes plans.
 
-Agent Hive lets multiple AI models collaborate on the same task automatically.
-
-```bash
-npm install -g agenthive
-hive setup
-hive "build a SaaS landing page"
-```
+Agent Hive lets multiple AI runtimes collaborate as one team.
 
 ```
+$ hive
+
 🐝 Agent Hive
 
 What do you want to build?
 > Build a SaaS landing page
 
-[select] codex → claude (simpleChain)
-✓ COMPLETED — score: 95, revisions: 0
+[select] codex → claude
+✓ COMPLETED — score: 95
 ```
 
 ---
 
-## Quick Start
+## Install
 
 ```bash
-# Install
 npm install -g agenthive
-
-# Configure (pick provider, auto-discovers models)
-hive setup
-
-# Run
-hive "Build a REST API for users"
 ```
 
-## Why Agent Hive?
+## Setup
 
-| Single Agent | Agent Hive |
+```bash
+hive setup
+```
+
+Pick your provider, enter your API key, choose a model. Done.
+
+## Start
+
+```bash
+hive
+```
+
+Just describe what you want to build. Agent Hive handles the rest.
+
+## How It Works
+
+```
+You describe a task
+       ↓
+Agent Hive picks the best AI for execution and review
+       ↓
+Executor writes the code
+       ↓
+Reviewer evaluates independently
+       ↓
+If issues found → automatic revision loop
+       ↓
+✓ Done
+```
+
+## What Makes It Different
+
+| Single AI | Agent Hive |
 |---|---|
 | Writes + self-reviews | Writes + independent review |
 | Misses own bugs | Second set of eyes |
-| One model's perspective | Multi-model collaboration |
-
-## What It Does
-
-1. **Classify** — understands your task
-2. **Select** — picks best executor + reviewer
-3. **Execute** — executor writes code
-4. **Review** — reviewer evaluates independently
-5. **Revise** — loops until pass
+| One model's perspective | Multiple models collaborate |
 
 ## Commands
 
-| Command | Description |
-|---|---|
-| `hive` | Interactive mode |
-| `hive "task"` | Run a task |
-| `hive setup` | Configure provider |
-| `hive doctor` | Check health |
-| `hive memory list` | View memories |
-| `hive project list` | View projects |
-| `hive dashboard` | Visual dashboard |
+```bash
+hive                          # Interactive mode
+hive "build a REST API"       # Run directly
+hive setup                    # Configure provider
+hive doctor                   # Check health
+hive memory list              # View memories
+hive project list             # View projects
+hive cost                     # Token usage
+hive status                   # Current state
+```
 
 ## Supported Providers
 
 OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · Any OpenAI-compatible API
 
-## Memory System
+## Memory
 
-Agent Hive remembers your projects:
+Agent Hive remembers your projects across sessions.
 
 ```bash
-hive project init my-app typescript postgres
-hive "add user authentication"
-hive memory search auth  # finds past decisions
+hive project init my-app typescript react
+hive "add authentication"
+# ... close terminal ...
+hive resume
+# Continues where you left off
 ```
+
+## FAQ
+
+**Do I need multiple API keys?**
+No. One key works for everything.
+
+**What if I only have one provider?**
+Works fine. All runtimes use the same provider.
+
+**Is it free?**
+Agent Hive is free (MIT). You pay for API usage.
+
+## Links
+
+- [GitHub](https://github.com/toyako/agent-hive)
+- [Issues](https://github.com/toyako/agent-hive/issues)
+- [Discussions](https://github.com/toyako/agent-hive/discussions)
 
 ## License
 

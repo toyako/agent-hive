@@ -1,1 +1,0 @@
-{"taskId":"task-2993f295","attempt":1,"executor":"codex","reviewer":"claude","decision":"FAIL","score":0,"issues":["Review execution failed: Missing credentials. Please pass an `apiKey`, `workloadIdentity`, `adminAPIKey`, or set the `OPENAI_API_KEY` or `OPENAI_ADMIN_KEY` environment variable."],"timestamp":"2026-06-10T05:45:58.639Z"}

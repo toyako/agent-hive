@@ -14,7 +14,7 @@ const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
 // Known commands (not task descriptions)
-const KNOWN_CMDS = ["--version","--help","-v","-h","memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
+const KNOWN_CMDS = ["resume","cost","status","--version","--help","-v","-h","memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
 
 async function main() {
   const broker = new Broker();
@@ -50,7 +50,10 @@ async function main() {
     case "history": return cmdHistory(broker, ARGS);
     case "memory": return cmdMemory(ARGS);
     case "project": return cmdProject(ARGS);
-    default: printUsage();
+    case "resume": return cmdResume(broker);
+    case "cost": return cmdCost();
+    case "status": return cmdStatus();
+    case "help": case "--help": case "-h": return printUsage();
   }
 }
 
@@ -307,7 +310,90 @@ function cmdHistory(broker: Broker, args: string[]) {
   }
 }
 
-async function cmdMemory(args: string[]) {
+async function cmdResume(broker: Broker) {
+  const mm = new MemoryManager();
+  const projects = mm.listProjects();
+  const tasks = mm.listTaskMemories();
+
+  console.log("\n  🐝 Session Resume\n");
+
+  if (projects.length > 0) {
+    console.log("  Projects:");
+    projects.forEach(p => console.log(`    ${p.project}: ${p.techStack.join(", ") || "no stack"}`));
+  }
+
+  if (tasks.length > 0) {
+    console.log("\n  Recent tasks:");
+    tasks.slice(-5).forEach(t => console.log(`    ${t.taskId}: ${t.goal.slice(0, 60)}`));
+  }
+
+  if (projects.length === 0 && tasks.length === 0) {
+    console.log("  No previous session found.");
+    console.log("  Start with: hive project init <name>\n");
+  } else {
+    console.log("\n  Continue with: hive \"<your next task>\"\n");
+  }
+}
+
+function cmdCost() {
+  const mm = new MemoryManager();
+  const tasks = mm.listTaskMemories();
+
+  console.log("\n  🐝 Cost Tracking\n");
+
+  // Estimate costs from task memories
+  let totalTokens = 0;
+  const runtimeUsage: Record<string, { tasks: number; tokens: number }> = {};
+
+  for (const task of tasks) {
+    // Rough estimate: summary length * 4 (chars to tokens)
+    const est = Math.ceil((task.summary?.length || 0) / 4);
+    totalTokens += est;
+
+    // We don't track per-runtime tokens yet, so estimate evenly
+    for (const runtime of ["codex", "claude", "hermes"]) {
+      if (!runtimeUsage[runtime]) runtimeUsage[runtime] = { tasks: 0, tokens: 0 };
+      runtimeUsage[runtime].tasks++;
+      runtimeUsage[runtime].tokens += Math.ceil(est / 3);
+    }
+  }
+
+  for (const [name, usage] of Object.entries(runtimeUsage)) {
+    console.log(`  ${name}: ${usage.tasks} tasks, ~${usage.tokens} tokens`);
+  }
+  console.log(`\n  Total: ${tasks.length} tasks, ~${totalTokens} tokens`);
+  console.log(`  (Estimates based on memory summaries. Actual API usage may differ.)\n`);
+}
+
+function cmdStatus() {
+  const mm = new MemoryManager();
+  const projects = mm.listProjects();
+  const tasks = mm.listTaskMemories();
+
+  console.log("\n  🐝 Status\n");
+  console.log(`  Projects: ${projects.length}`);
+  console.log(`  Tasks: ${tasks.length}`);
+
+  // Check context
+  const configPath = path.resolve(process.cwd(), ".agent-hive/config.json");
+  if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    console.log(`  Provider: ${config.provider || "unknown"}`);
+    console.log(`  Model: ${config.model || "unknown"}`);
+  }
+
+  // Check memory files
+  const memDir = path.resolve(process.cwd(), ".agent-hive/memory");
+  if (fs.existsSync(memDir)) {
+    const taskFiles = fs.readdirSync(path.join(memDir, "tasks")).filter(f => f.endsWith(".json")).length;
+    const projFiles = fs.readdirSync(path.join(memDir, "projects")).filter(f => f.endsWith(".json")).length;
+    console.log(`  Memory: ${taskFiles} task entries, ${projFiles} project entries`);
+  }
+
+  console.log("");
+}
+
+function cmdMemory(args: string[]) {
   const mm = new MemoryManager();
   const sub = args[1];
 
