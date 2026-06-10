@@ -14,7 +14,7 @@ const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
 // Known commands (not task descriptions)
-const KNOWN_CMDS = ["memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
+const KNOWN_CMDS = ["--version","--help","-v","-h","memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
 
 async function main() {
   const broker = new Broker();
@@ -44,12 +44,12 @@ async function main() {
     case "run": return cmdRun(broker, ARGS);
     case "dashboard": return cmdDashboard();
     case "doctor": return cmdDoctor(broker);
-    case "version": return cmdVersion();
+    case "version": case "--version": case "-v": return cmdVersion();
+    case "help": case "--help": case "-h": return printUsage();
     case "health": return cmdHealth(broker);
     case "history": return cmdHistory(broker, ARGS);
     case "memory": return cmdMemory(ARGS);
     case "project": return cmdProject(ARGS);
-    case "help": return printUsage();
     default: printUsage();
   }
 }

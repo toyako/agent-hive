@@ -35,7 +35,7 @@ hive "构建一个用户 CRUD API"
 | 命令 | 说明 |
 |---|---|
 | `hive` | 交互模式 |
-| `hive "任务"` | 运行任务 |
+| `hive "task"` | 运行任务 |
 | `hive setup` | 配置供应商 |
 | `hive doctor` | 健康检查 |
 | `hive memory list` | 查看记忆 |

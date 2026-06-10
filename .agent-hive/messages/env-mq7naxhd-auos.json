@@ -1,0 +1,21 @@
+{
+  "id": "env-mq7naxhd-auos",
+  "taskId": "task-2993f295",
+  "conversationId": "conv-2418ba2e",
+  "from": "codex",
+  "to": "broker",
+  "type": "RESULT",
+  "payload": {
+    "success": true,
+    "output": "```\nMiMo-v2.5-pro\n─────────────────────────────────\nDeveloper:     Xiaomi MiMo Team\nParameters:    1T (1 trillion)\nContext Window: 1M tokens\n─────────────────────────────────\n```\n\nHey there! 👋 That looks like a terminal command! I'm **MiMo-v2.5-pro**, the latest version from the Xiaomi MiMo Team. I'm running with 1 trillion parameters and can handle up to 1 million tokens of context.\n\nIs there something specific you'd like to know about me, or is there anything I can help you with today?"
+  },
+  "metadata": {
+    "hopCount": 0,
+    "maxHops": 10,
+    "priority": 5,
+    "routingPath": [
+      "codex"
+    ]
+  },
+  "timestamp": 1781070355201
+}

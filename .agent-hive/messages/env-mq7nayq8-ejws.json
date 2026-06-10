@@ -1,0 +1,24 @@
+{
+  "id": "env-mq7nayq8-ejws",
+  "taskId": "task-2993f295",
+  "conversationId": "conv-2418ba2e",
+  "from": "claude",
+  "to": "broker",
+  "type": "REVIEW",
+  "payload": {
+    "decision": "FAIL",
+    "score": 0,
+    "issues": [
+      "Review execution failed: Missing credentials. Please pass an `apiKey`, `workloadIdentity`, `adminAPIKey`, or set the `OPENAI_API_KEY` or `OPENAI_ADMIN_KEY` environment variable."
+    ]
+  },
+  "metadata": {
+    "hopCount": 0,
+    "maxHops": 10,
+    "priority": 5,
+    "routingPath": [
+      "claude"
+    ]
+  },
+  "timestamp": 1781070356816
+}

@@ -1,0 +1,20 @@
+{
+  "id": "env-mq7naqyu-fki0",
+  "taskId": "task-2993f295",
+  "conversationId": "conv-2418ba2e",
+  "from": "broker",
+  "to": "codex",
+  "type": "TASK",
+  "payload": {
+    "instruction": "--version"
+  },
+  "metadata": {
+    "hopCount": 0,
+    "maxHops": 10,
+    "priority": 5,
+    "routingPath": [
+      "broker"
+    ]
+  },
+  "timestamp": 1781070346758
+}

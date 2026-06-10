@@ -1,6 +1,6 @@
 {
   "name": "agenthive",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Multi-Runtime Agent Orchestration Framework",
   "main": "dist/commands/cli.js",
   "bin": {
@@ -12,19 +12,39 @@
     "demo": "node dist/commands/demo.js"
   },
   "keywords": [
+    "ai",
     "agent",
-    "mesh",
-    "broker",
-    "orchestration"
+    "multi-runtime",
+    "orchestration",
+    "claude",
+    "codex",
+    "llm"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "toyako",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.15.21",
-    "typescript": "^5.8.3",
-    "xstate": "^5.20.0"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "openai": "^6.42.0"
+    "openai": "^6.42.0",
+    "xstate": "^5.20.0"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "README.zh-CN.md",
+    "README.ja.md",
+    "README.es.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "runtime.json.example"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toyako/agent-hive.git"
   }
 }
