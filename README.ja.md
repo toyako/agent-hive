@@ -9,7 +9,7 @@ Claudeが書き、GPTがレビューし、Geminiが計画する。
 Agent Hiveは複数のAIモデルが同じタスクに自動的に協力します。
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 hive setup
 hive "SaaSランディングページを作成"
 ```
@@ -17,7 +17,7 @@ hive "SaaSランディングページを作成"
 ## クイックスタート
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 hive setup
 hive "ユーザーCRUD APIを作成"
 ```

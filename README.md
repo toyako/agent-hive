@@ -23,7 +23,7 @@ What do you want to build?
 ## Install
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 ```
 
 ## Setup

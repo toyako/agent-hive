@@ -23,7 +23,7 @@ $ hive
 ## 安装
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 ```
 
 ## 配置

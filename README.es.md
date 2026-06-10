@@ -9,7 +9,7 @@ Claude escribe. GPT revisa. Gemini planifica.
 Agent Hive permite que múltiples modelos AI colaboren automáticamente en la misma tarea.
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 hive setup
 hive "construir una landing page SaaS"
 ```
@@ -17,7 +17,7 @@ hive "construir una landing page SaaS"
 ## Inicio Rápido
 
 ```bash
-npm install -g agenthive
+npm install -g @toyako/agent-hive
 hive setup
 hive "construir una API CRUD de usuarios"
 ```
