@@ -9,3 +9,5 @@ run-validation.js
 *.log
 .env
 .env.*
+.npmrc
+agenthive-*.tgz
