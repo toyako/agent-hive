@@ -4,11 +4,11 @@
   "events": [
     {
       "type": "created",
-      "timestamp": 1781180112924
+      "timestamp": 1781192469383
     },
     {
       "type": "benchmark-start",
-      "timestamp": 1781180112927,
+      "timestamp": 1781192469386,
       "data": {
         "runtime": "claude",
         "case": "reason-01"
@@ -16,7 +16,7 @@
     },
     {
       "type": "benchmark-done",
-      "timestamp": 1781180112930,
+      "timestamp": 1781192469391,
       "data": {
         "success": true,
         "score": 0,
@@ -25,13 +25,13 @@
     },
     {
       "type": "completed",
-      "timestamp": 1781180112933,
+      "timestamp": 1781192469395,
       "data": {
         "status": "COMPLETED"
       }
     }
   ],
-  "startedAt": 1781180112924,
-  "completedAt": 1781180112933,
-  "durationMs": 9
+  "startedAt": 1781192469383,
+  "completedAt": 1781192469395,
+  "durationMs": 12
 }
