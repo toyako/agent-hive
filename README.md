@@ -1,5 +1,7 @@
 # Agent Hive
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 **One task. Multiple AI minds.**
 
 Claude writes. Codex reviews. Hermes plans.
@@ -40,31 +42,7 @@ Pick your provider, enter your API key, choose a model. Done.
 hive
 ```
 
-Just describe what you want to build. Agent Hive handles the rest.
-
-## How It Works
-
-```
-You describe a task
-       ↓
-Agent Hive picks the best AI for execution and review
-       ↓
-Executor writes the code
-       ↓
-Reviewer evaluates independently
-       ↓
-If issues found → automatic revision loop
-       ↓
-✓ Done
-```
-
-## What Makes It Different
-
-| Single AI | Agent Hive |
-|---|---|
-| Writes + self-reviews | Writes + independent review |
-| Misses own bugs | Second set of eyes |
-| One model's perspective | Multiple models collaborate |
+Describe what you want. Agent Hive handles the rest.
 
 ## Commands
 
@@ -73,27 +51,31 @@ hive                          # Interactive mode
 hive "build a REST API"       # Run directly
 hive setup                    # Configure provider
 hive doctor                   # Check health
+hive config                   # Config center
+hive roles                    # View agent roles
+hive workflows                # View workflows
+hive tools                    # View available tools
+hive mcp                      # MCP servers
+hive channels                 # Communication channels
 hive memory list              # View memories
 hive project list             # View projects
+hive resume                   # Resume last project
 hive cost                     # Token usage
 hive status                   # Current state
 ```
 
 ## Supported Providers
 
-OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · Any OpenAI-compatible API
+OpenAI · Claude · Gemini · DeepSeek · OpenRouter · Mimo · Ollama · Custom
 
-## Memory
+## How It Works
 
-Agent Hive remembers your projects across sessions.
-
-```bash
-hive project init my-app typescript react
-hive "add authentication"
-# ... close terminal ...
-hive resume
-# Continues where you left off
-```
+1. You describe a task
+2. Agent Hive picks the best AI for execution and review
+3. Executor writes the code
+4. Reviewer evaluates independently
+5. If issues found → automatic revision loop
+6. Done
 
 ## FAQ
 
@@ -109,8 +91,8 @@ Agent Hive is free (MIT). You pay for API usage.
 ## Links
 
 - [GitHub](https://github.com/toyako/agent-hive)
+- [npm](https://www.npmjs.com/package/@toyako/agent-hive)
 - [Issues](https://github.com/toyako/agent-hive/issues)
-- [Discussions](https://github.com/toyako/agent-hive/discussions)
 
 ## License
 

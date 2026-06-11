@@ -14,7 +14,7 @@ const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
 // Known commands (not task descriptions)
-const KNOWN_CMDS = ["resume","cost","status","--version","--help","-v","-h","memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
+const KNOWN_CMDS = ["config","mcp","roles","role","workflows","tools","channels","resume","cost","status","--version","--help","-v","-h","memory","project","setup","init","detect","agents","link","graph","graph-template","graph-validate","graph-migrate","task","run","dashboard","doctor","version","health","history","help"];
 
 async function main() {
   const broker = new Broker();
@@ -53,6 +53,13 @@ async function main() {
     case "resume": return cmdResume(broker);
     case "cost": return cmdCost();
     case "status": return cmdStatus();
+    case "config": return cmdConfig();
+    case "mcp": return cmdMCP(ARGS);
+    case "roles": return cmdRoles(ARGS);
+    case "role": return cmdRoleInfo(ARGS);
+    case "workflows": return cmdWorkflows();
+    case "tools": return cmdTools();
+    case "channels": return cmdChannels(ARGS);
     case "help": case "--help": case "-h": return printUsage();
   }
 }
@@ -390,6 +397,156 @@ function cmdStatus() {
     console.log(`  Memory: ${taskFiles} task entries, ${projFiles} project entries`);
   }
 
+  console.log("");
+}
+
+function cmdConfig() {
+  console.log("\n  🐝 Config Center\n");
+  console.log("  1. Providers    — API providers configuration");
+  console.log("  2. Models       — Default model settings");
+  console.log("  3. Roles        — Agent role assignments");
+  console.log("  4. Tools        — Available tools");
+  console.log("  5. MCP          — MCP server registry");
+  console.log("  6. Projects     — Project management");
+  console.log("  7. Memory       — Memory settings");
+  console.log("  8. Status       — Current configuration\n");
+
+  const configPath = path.resolve(process.cwd(), ".agent-hive/config.json");
+  if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    console.log("  Current config:");
+    console.log(`    Provider: ${config.provider || "not set"}`);
+    console.log(`    Model: ${config.model || "not set"}`);
+    console.log(`    Base URL: ${config.baseUrl || "not set"}`);
+  } else {
+    console.log("  No config found. Run: hive setup");
+  }
+  console.log("");
+}
+
+function cmdMCP(args: string[]) {
+  const sub = args[1];
+  const mcpServers = [
+    { name: "filesystem", status: "available", description: "File system access" },
+    { name: "github", status: "available", description: "GitHub API integration" },
+    { name: "browser", status: "experimental", description: "Browser automation" },
+    { name: "database", status: "coming-soon", description: "Database access" },
+  ];
+
+  if (sub === "list" || !sub) {
+    console.log("\n  🐝 MCP Servers\n");
+    for (const s of mcpServers) {
+      const icon = s.status === "available" ? "✓" : s.status === "experimental" ? "⚡" : "○";
+      console.log(`    ${icon} ${s.name.padEnd(15)} ${s.description.padEnd(25)} [${s.status}]`);
+    }
+  } else if (sub === "status") {
+    console.log("\n  🐝 MCP Status\n");
+    for (const s of mcpServers) {
+      console.log(`    ${s.name}: ${s.status}`);
+    }
+  } else {
+    console.log("\n  Usage: hive mcp [list|status]\n");
+  }
+  console.log("");
+}
+
+function cmdRoles(args: string[]) {
+  const roles = [
+    { name: "Planner", runtime: "hermes", caps: "planning, research" },
+    { name: "Coder", runtime: "codex", caps: "coding, refactor" },
+    { name: "Reviewer", runtime: "claude", caps: "review, architecture" },
+    { name: "Architect", runtime: "claude", caps: "architecture, planning" },
+    { name: "Researcher", runtime: "hermes", caps: "research, planning" },
+  ];
+
+  if (args[1] === "info" && args[2]) {
+    return cmdRoleInfo(args);
+  }
+
+  console.log("\n  🐝 Roles\n");
+  for (const r of roles) {
+    console.log(`    ${r.name.padEnd(15)} → ${r.runtime.padEnd(10)} (${r.caps})`);
+  }
+  console.log("\n  Details: hive role info <name>\n");
+}
+
+function cmdRoleInfo(args: string[]) {
+  const roleName = (args[1] === "info" ? args[2] : args[1]) || "";
+  const roles: Record<string, { runtime: string; caps: string; description: string }> = {
+    planner: { runtime: "hermes", caps: "planning, research", description: "Breaks tasks into steps, creates execution plans" },
+    coder: { runtime: "codex", caps: "coding, refactor", description: "Writes and refactors code" },
+    reviewer: { runtime: "claude", caps: "review, architecture", description: "Reviews code quality, finds issues" },
+    architect: { runtime: "claude", caps: "architecture, planning", description: "Designs system architecture" },
+    researcher: { runtime: "hermes", caps: "research, planning", description: "Researches topics, analyzes codebases" },
+  };
+
+  const role = roles[roleName.toLowerCase()];
+  if (role) {
+    console.log(`\n  🐝 Role: ${roleName}\n`);
+    console.log(`  Runtime: ${role.runtime}`);
+    console.log(`  Capabilities: ${role.caps}`);
+    console.log(`  Description: ${role.description}\n`);
+  } else {
+    console.log(`\n  Role "${roleName}" not found. Available: planner, coder, reviewer, architect, researcher\n`);
+  }
+}
+
+function cmdWorkflows() {
+  const workflows = [
+    { name: "Single Agent", description: "One runtime does everything", topology: "simpleChain" },
+    { name: "Code Review", description: "Execute + Review loop", topology: "simpleChain" },
+    { name: "Research + Planning", description: "Plan → Execute → Review", topology: "planExecuteReview" },
+    { name: "Architecture Design", description: "Architect → Implement → Review", topology: "planExecuteReview" },
+    { name: "Full Team", description: "Planner → Coder → Reviewer → Architect", topology: "planExecuteReview" },
+  ];
+
+  console.log("\n  🐝 Workflows\n");
+  for (const w of workflows) {
+    console.log(`    ${w.name.padEnd(25)} ${w.description}`);
+  }
+  console.log("\n  Agent Hive automatically selects the best workflow for your task.\n");
+}
+
+function cmdTools() {
+  console.log("\n  🐝 Tools\n");
+  console.log("  Available:");
+  console.log("    ✓ Files         — Read, write, edit files");
+  console.log("    ✓ Terminal      — Run shell commands");
+  console.log("    ✓ Memory        — Project memory system");
+  console.log("    ✓ Planning      — Task decomposition");
+  console.log("\n  Experimental:");
+  console.log("    ⚡ Browser       — Web page interaction");
+  console.log("    ⚡ Web Search    — Internet search");
+  console.log("\n  Coming Soon:");
+  console.log("    ○ Video         — Video generation");
+  console.log("    ○ Discord       — Discord integration");
+  console.log("    ○ Telegram      — Telegram bot\n");
+}
+
+function cmdChannels(args: string[]) {
+  const sub = args[1];
+  const channels = [
+    { name: "CLI", status: "active", description: "Terminal interface" },
+    { name: "Discord", status: "coming-soon", description: "Discord bot" },
+    { name: "Telegram", status: "coming-soon", description: "Telegram bot" },
+    { name: "Feishu", status: "coming-soon", description: "Feishu/Lark bot" },
+    { name: "WeChat", status: "coming-soon", description: "WeChat integration" },
+  ];
+
+  if (sub === "list" || !sub) {
+    console.log("\n  🐝 Channels\n");
+    for (const c of channels) {
+      const icon = c.status === "active" ? "✓" : "○";
+      console.log(`    ${icon} ${c.name.padEnd(15)} ${c.description.padEnd(25)} [${c.status}]`);
+    }
+  } else if (sub === "status") {
+    console.log("\n  🐝 Channel Status\n");
+    for (const c of channels) {
+      console.log(`    ${c.name}: ${c.status}`);
+    }
+  } else {
+    console.log("\n  Usage: hive channels [list|status]\n");
+  }
   console.log("");
 }
 
