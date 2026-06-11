@@ -1,18 +1,18 @@
 /**
- * ExecutionEngine — unified command execution for all platforms.
- * All CLI commands go through this engine.
+ * ExecutionEngine v1.1 — AST-driven deterministic execution kernel.
+ * No raw shell strings. All commands are compiled AST nodes.
  */
 import { spawn } from "child_process";
-import { PlatformAdapter } from "./PlatformAdapter";
+import { CommandAST, ExecCommand } from "../command/CommandAST";
+import { CommandCompiler, CompiledCommand } from "../compiler/CommandCompiler";
+import { detectCapabilities, PlatformCapabilities } from "../platform/PlatformCapabilities";
+import { ExecutionSandbox } from "../sandbox/ExecutionSandbox";
 import { StructuredLogger } from "./StructuredLogger";
 import { ResultNormalizer } from "./ResultNormalizer";
 
 export interface ExecutionContext {
-  platform: "windows" | "linux";
-  cwd: string;
-  env: Record<string, string>;
-  timeout: number;
   traceId: string;
+  timeout: number;
 }
 
 export interface ExecutionResult {
@@ -21,121 +21,112 @@ export interface ExecutionResult {
   exitCode: number;
   durationMs: number;
   platform: string;
-  normalizedCommand: string;
+  compiledCommand: CompiledCommand;
   traceId: string;
 }
 
 export class ExecutionEngine {
-  private platform: PlatformAdapter;
+  private capabilities: PlatformCapabilities;
+  private compiler: CommandCompiler;
+  private sandbox: ExecutionSandbox;
   private logger: StructuredLogger;
 
   constructor(logger?: StructuredLogger) {
-    this.platform = new PlatformAdapter();
+    this.capabilities = detectCapabilities();
+    this.compiler = new CommandCompiler(this.capabilities);
+    this.sandbox = new ExecutionSandbox();
     this.logger = logger || new StructuredLogger();
   }
 
-  /** Execute a command with full context tracking */
-  async runCommand(cmd: string, args: string[], ctx: Partial<ExecutionContext> = {}): Promise<ExecutionResult> {
+  /** Execute an AST node */
+  async run(ast: CommandAST, ctx: Partial<ExecutionContext> = {}): Promise<ExecutionResult> {
     const traceId = ctx.traceId || `trace-${Date.now().toString(36)}`;
+    const timeout = ctx.timeout || 600_000;
     const startTime = Date.now();
 
-    const fullCtx: ExecutionContext = {
-      platform: this.platform.detect(),
-      cwd: ctx.cwd || process.cwd(),
-      env: ctx.env || { ...process.env } as Record<string, string>,
-      timeout: ctx.timeout || 600_000,
-      traceId,
-    };
+    // Step 1: Validate AST
+    const validation = this.sandbox.validate(ast);
+    if (!validation.valid) {
+      const err = `AST validation failed: ${validation.errors.join(", ")}`;
+      this.logger.log({ timestamp: startTime, platform: this.capabilities.pathStyle === "windows" ? "windows" : "linux", command: "INVALID", stage: "error", error: err, traceId });
+      return { stdout: "", stderr: err, exitCode: 1, durationMs: 0, platform: this.capabilities.pathStyle, compiledCommand: { platform: "linux", executable: "", args: [], env: {}, shell: false }, traceId };
+    }
 
-    const normalizedCmd = this.platform.normalizeCommand(cmd);
+    // Step 2: Compile AST → CompiledCommand
+    const compiled = this.compiler.compile(ast);
+    const primary = compiled[0];
 
     this.logger.log({
       timestamp: startTime,
-      platform: fullCtx.platform,
-      command: `${cmd} ${args.join(" ")}`,
-      stage: "start",
+      platform: primary.platform,
+      command: `${primary.executable} ${primary.args.join(" ")}`,
+      stage: "compiled",
+      compiledCommand: primary,
       traceId,
     });
 
+    // Step 3: Execute
     try {
-      const result = await this.exec(normalizedCmd, args, fullCtx);
+      const raw = await this.execCompiled(primary, timeout);
       const durationMs = Date.now() - startTime;
 
-      const normalized = ResultNormalizer.normalize(result.stdout, result.stderr, fullCtx.platform);
+      // Step 4: Normalize BEFORE logging
+      const normalized = ResultNormalizer.normalize(raw.stdout, raw.stderr, primary.platform as "windows" | "linux");
 
-      const execResult: ExecutionResult = {
-        stdout: normalized.stdout,
-        stderr: normalized.stderr,
-        exitCode: result.exitCode,
-        durationMs,
-        platform: fullCtx.platform,
-        normalizedCommand: `${cmd} ${args.join(" ")}`,
-        traceId,
-      };
-
+      // Step 5: Log normalized result
       this.logger.log({
         timestamp: Date.now(),
-        platform: fullCtx.platform,
-        command: execResult.normalizedCommand,
+        platform: primary.platform,
+        command: `${primary.executable} ${primary.args.join(" ")}`,
         stage: "complete",
-        exitCode: execResult.exitCode,
-        durationMs: execResult.durationMs,
-        traceId,
-      });
-
-      return execResult;
-    } catch (err: any) {
-      const durationMs = Date.now() - startTime;
-
-      this.logger.log({
-        timestamp: Date.now(),
-        platform: fullCtx.platform,
-        command: `${cmd} ${args.join(" ")}`,
-        stage: "error",
-        error: err.message,
+        exitCode: raw.exitCode,
         durationMs,
         traceId,
       });
 
       return {
-        stdout: "",
-        stderr: err.message,
-        exitCode: 1,
+        stdout: normalized.stdout,
+        stderr: normalized.stderr,
+        exitCode: raw.exitCode,
         durationMs,
-        platform: fullCtx.platform,
-        normalizedCommand: `${cmd} ${args.join(" ")}`,
+        platform: primary.platform,
+        compiledCommand: primary,
         traceId,
       };
+    } catch (err: any) {
+      const durationMs = Date.now() - startTime;
+      this.logger.log({ timestamp: Date.now(), platform: primary.platform, command: `${primary.executable} ${primary.args.join(" ")}`, stage: "error", error: err.message, durationMs, traceId });
+      return { stdout: "", stderr: err.message, exitCode: 1, durationMs, platform: primary.platform, compiledCommand: primary, traceId };
     }
   }
 
-  private exec(cmd: string, args: string[], ctx: ExecutionContext): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  /** Legacy: run a simple command (convenience wrapper) */
+  async runCommand(cmd: string, args: string[], ctx: Partial<ExecutionContext> = {}): Promise<ExecutionResult> {
+    const { exec } = await import("../command/CommandAST");
+    return this.run(exec(cmd, args), ctx);
+  }
+
+  private execCompiled(cmd: CompiledCommand, timeout: number): Promise<{ stdout: string; stderr: string; exitCode: number }> {
     return new Promise((resolve, reject) => {
-      const proc = spawn(cmd, args, {
-        cwd: ctx.cwd,
-        env: ctx.env,
+      const proc = spawn(cmd.executable, cmd.args, {
+        cwd: cmd.cwd,
+        env: cmd.env,
         stdio: ["pipe", "pipe", "pipe"],
-        shell: ctx.platform === "windows",
+        shell: cmd.shell,
       });
 
       let stdout = "", stderr = "";
       proc.stdout.on("data", (d: Buffer) => stdout += d.toString());
       proc.stderr.on("data", (d: Buffer) => stderr += d.toString());
 
-      const timer = setTimeout(() => {
-        proc.kill("SIGTERM");
-        reject(new Error(`TIMEOUT after ${ctx.timeout}ms`));
-      }, ctx.timeout);
+      const timer = setTimeout(() => { proc.kill("SIGTERM"); reject(new Error(`TIMEOUT after ${timeout}ms`)); }, timeout);
 
       proc.on("close", (code: number | null) => {
         clearTimeout(timer);
         resolve({ stdout: stdout.trim(), stderr: stderr.trim(), exitCode: code ?? 1 });
       });
 
-      proc.on("error", (err: Error) => {
-        clearTimeout(timer);
-        reject(err);
-      });
+      proc.on("error", (err: Error) => { clearTimeout(timer); reject(err); });
     });
   }
 }

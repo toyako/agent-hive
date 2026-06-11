@@ -9,11 +9,12 @@ export interface LogEntry {
   timestamp: number;
   platform: string;
   command: string;
-  stage: "start" | "complete" | "error" | "info";
+  stage: "start" | "compiled" | "complete" | "error" | "info";
   exitCode?: number;
   durationMs?: number;
   error?: string;
   traceId: string;
+  compiledCommand?: any;
 }
 
 export class StructuredLogger {
