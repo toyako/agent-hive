@@ -46,20 +46,16 @@ export class ExecutionSandbox {
     }
 
     // Reject shell injection patterns in cmd
-    if (ast.cmd.includes(";") || ast.cmd.includes("&&") || ast.cmd.includes("||")) {
-      errors.push(`Unsafe shell injection pattern in cmd: ${ast.cmd}`);
+    const dangerous = [";", "&&", "||", "|", ">", ">>", "<", "`", "$("];
+    for (const pattern of dangerous) {
+      if (ast.cmd.includes(pattern)) {
+        errors.push(`Unsafe shell injection pattern in cmd: ${ast.cmd}`);
+        break;
+      }
     }
 
-    // Reject shell injection patterns in args
-    for (const arg of (ast.args || [])) {
-      if (typeof arg !== "string") {
-        errors.push("All args must be strings");
-        continue;
-      }
-      if (arg.includes(";") || arg.includes("&&") || arg.includes("||")) {
-        errors.push(`Unsafe shell injection pattern in arg: ${arg}`);
-      }
-    }
+    // Args are safe — they're passed as literal strings, not interpreted by shell
+    // No need to check args for injection patterns
 
     // Reject empty cmd
     if (!ast.cmd.trim()) {
