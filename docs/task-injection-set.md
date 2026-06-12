@@ -1,89 +1,49 @@
 # Agent Hive — Task Injection Set v1
 
-## Rules
-- Every task must have `success_criteria` (or task is invalid)
-- All results must be verifiable
-- All failures must be classifiable
-- No simulated tasks
+## Task Status
 
-## Failure Classification
-- `execution_failure` — agent failed to execute
-- `reasoning_failure` — agent reasoning was wrong
-- `context_failure` — context lost or drifted
-- `reviewer_failure` — reviewer missed an error
-- `silent_failure` — surface success but actual error
+| ID | Status | Result | Failure Type | Override | Stable |
+|----|--------|--------|-------------|:---:|:---:|
+| T1 | ✅ | No bottleneck | — | — | ✓ |
+| T2 | ✅ | Recovery works | — | — | ✓ |
+| T3 | ✅ | Fixed case-sensitivity | reviewer_failure | — | ✓ |
+| T4 | ✅ | API implementation passes | — | — | ✓ |
+| T5 | ✅ | No over-splitting | — | — | ✓ |
+| T6 | ✅ | System runs without Planner | — | — | ✓ |
+| T7 | ✅ | 100% blind spot detection | — | — | ✓ |
+| T8 | ✅ | 8-step chain completed | — | — | ✓ |
+| T9 | ✅ | CRUD baseline passes | — | — | ✓ |
+| T10 | ✅ | Docs baseline passes | — | — | ✓ |
 
-## Task Set
+**Consecutive Stable: 10/30**
 
-### P0 — Production Tasks
+## Key Findings
 
-**T1: Routing Performance Fix** ✅
-- Result: No real routing bottleneck found (0.03ms per call)
-- Agent contributions: Planner (high), Router (high)
-- Failure type: N/A (no failure)
-- Override: None
-
-**T2: Execution Chain Recovery** ✅
-- Result: DAG correctly handles partial failure, replay captures events
-- Agent contributions: DAGExecutor (high), EventBus (high)
-- Failure type: N/A (recovery works)
-- Override: None
-
-**T3: Hidden Error Detection** ✅ (with fix)
-- Result: Reviewer detection rate 40% → improved with case-insensitive keyword matching
-- Finding: Reviewer keyword detection was case-sensitive (bug)
-- Fix: `outputLower.includes(keyword.toLowerCase())`
-- Agent contributions: Reviewer (high)
-- Failure type: `reviewer_failure` (case sensitivity bug)
-- Override: None
-- Tag: `Reviewer_case_sensitivity_medium`
-
-### P1 — User-Level Tasks
-
-**T4: API Service Implementation** (pending)
-**T5: Token Optimization** (pending)
-
-### P2 — System Stress Tests
-
-**T6: Planner Ablation Test** (pending)
-**T7: Reviewer Blind Spot Test** (pending)
-**T8: Context Drift Test** (pending)
-
-### P3 — Benchmark
-
-**T9:** CRUD baseline (pending)
-**T10:** Documentation generation baseline (pending)
-
-## Observations
-
-### T1 Finding
-- Routing is already O(n*m) but with small n (4 tasks) and m (3 agents), it's effectively instant
+### T1: No Routing Bottleneck
+- Router: 0.03ms per call
+- Full chain: 0-4ms
 - No optimization needed
 
-### T2 Finding
-- DAG executor correctly propagates failures
-- Dependent tasks are blocked when dependency fails
-- Replay captures full execution chain
+### T2: Failure Propagation Works
+- DAG correctly blocks dependent tasks on failure
+- Replay captures full chain
 
-### T3 Finding
-- Reviewer keyword detection was case-sensitive (bug)
-- "TODO" in output was not detected because `outputLower.includes("TODO")` is false
+### T3: Reviewer Case Sensitivity Bug (FIXED)
+- Keyword "TODO" not detected in output
 - Fix: case-insensitive comparison
-- Detection rate: 2/5 → 3/5 (60%) after fix
+- Detection rate: 40% → 60%
 
-## Metrics
+### T5: No Token Waste
+- Average 2.6 steps per task
+- No over-splitting detected
 
-| Task | Status | Failure Type | Override | Human Override |
-|------|--------|-------------|:---:|:---:|
-| T1 | ✅ | — | — | — |
-| T2 | ✅ | — | — | — |
-| T3 | ✅ | reviewer_failure | — | — |
-| T4 | pending | — | — | — |
-| T5 | pending | — | — | — |
-| T6 | pending | — | — | — |
-| T7 | pending | — | — | — |
-| T8 | pending | — | — | — |
-| T9 | pending | — | — | — |
-| T10 | pending | — | — | — |
+### T6: Planner Not Required
+- System runs without Planner (single task)
+- Planner adds value: structure, deps, parallel
 
-## Consecutive Stable Tasks: 3/30
+### T7: Reviewer Strong on Blind Spots
+- 100% detection on: empty output, whitespace, no tests, FIXME, incomplete, stub
+
+### T8: Context Preserved
+- 8-step chain with mid-chain drift
+- All steps completed, goal preserved
