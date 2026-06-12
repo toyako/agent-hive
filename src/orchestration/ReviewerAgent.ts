@@ -51,7 +51,7 @@ export class ReviewerAgent implements Agent {
     const negativeKeywords = ["warning", "TODO", "FIXME", "no tests", "partial", "incomplete", "not implemented", "stub"];
     const outputLower = (result.output || "").toLowerCase();
     for (const keyword of negativeKeywords) {
-      if (outputLower.includes(keyword)) {
+      if (outputLower.includes(keyword.toLowerCase())) {
         findings.push(`Negative indicator found: "${keyword}"`);
         score -= 15;
       }
