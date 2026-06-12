@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "tasks": 50,
+  "categories": {
+    "self-development": 10,
+    "bug-fix": 10,
+    "feature-delivery": 10,
+    "adversarial": 10,
+    "exploratory": 10
+  },
+  "difficultyDistribution": {
+    "L1": 10,
+    "L2": 15,
+    "L3": 15,
+    "L4": 10
+  },
+  "checksum": "sha256:f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2",
+  "frozenAt": "2026-06-11T00:00:00Z",
+  "frozenBy": "Agent Hive v1.4 Validation Sprint"
+}
