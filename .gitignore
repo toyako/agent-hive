@@ -1,7 +1,7 @@
 node_modules/
 dist/
 .agent-mesh/
-dashboard/
+/dashboard/
 artifacts/
 reports/
 runtime.json
