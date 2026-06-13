@@ -162,7 +162,7 @@ export class ObservationDashboard {
 
   private computeCoreMetrics(stats: StabilityWindowStats): CoreMetrics {
     return {
-      consecutive_stable: stats.total_stable,
+      consecutive_stable: this.engine.getCounter(),
       stability_tier: this.engine.getTier(),
       reset_frequency: stats.failure_density,
       hidden_failure_rate: stats.hidden_failure_rate,
