@@ -11,3 +11,7 @@ run-validation.js
 .env.*
 .npmrc
 agenthive-*.tgz
+
+# World Cup Prediction (not part of core)
+world-cup-prediction/
+world-cup-predition/
