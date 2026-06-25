@@ -10,6 +10,7 @@ import { interpret } from "xstate";
 import { Task, AgentAdapter, ReviewResult, TaskTimeBudget } from "../types";
 import * as fs from "fs";
 import * as path from "path";
+import { FailureInterceptor, KernelPanicError } from "../kernel";
 
 const REVISION_PROMPT_TEMPLATE = fs.readFileSync(
   path.join(__dirname, "../prompts/revision.txt"), "utf-8"
@@ -65,7 +66,25 @@ export class TaskProcessor {
 
     try {
       execResult = await this.execWithTimeout(() => executor.execute(task), task.timeout);
+      
+      // 🚨 KERNEL ENFORCEMENT: Validate execution result
+      FailureInterceptor.handle({
+        success: execResult.success,
+        error: execResult.error,
+        taskId: task.id
+      });
     } catch (err: any) {
+      // 🚨 KERNEL PANIC: Stop pipeline on failure
+      if (err instanceof KernelPanicError) {
+        actor.send({ type: "ERROR", error: err.message });
+        log.error(`KERNEL PANIC: ${err.message}`);
+        console.log(`  [🛑 KERNEL PANIC] ${err.message}`);
+        task.status = "FAILED";
+        this.queue.save(task);
+        actor.stop();
+        return;
+      }
+      
       actor.send({ type: "ERROR", error: err.message });
       log.error(`Execution failed: ${err.message}`);
       console.log(`  [✗ ${task.executor}] ERROR: ${err.message}`);
@@ -143,8 +162,29 @@ export class TaskProcessor {
 
     try {
       execResult = await this.execWithTimeout(() => executor.execute(task), task.timeout);
+      
+      // 🚨 KERNEL ENFORCEMENT: Validate execution result
+      FailureInterceptor.handle({
+        success: execResult.success,
+        error: execResult.error,
+        taskId: task.id
+      });
+      
       this.graphOps.circuitBreaker.recordSuccess(task.executor);
     } catch (err: any) {
+      // 🚨 KERNEL PANIC: Stop pipeline on failure
+      if (err instanceof KernelPanicError) {
+        this.graphOps.circuitBreaker.recordFailure(task.executor);
+        actor.send({ type: "ERROR", error: err.message });
+        log.error(`KERNEL PANIC: ${err.message}`);
+        console.log(`  [🛑 KERNEL PANIC] ${err.message}`);
+        task.status = "FAILED";
+        this.queue.save(task);
+        this.graphOps.conversations.fail(conversation.id, err.message);
+        actor.stop();
+        return;
+      }
+      
       this.graphOps.circuitBreaker.recordFailure(task.executor);
       actor.send({ type: "ERROR", error: err.message });
       log.error(`Execution failed: ${err.message}`);
