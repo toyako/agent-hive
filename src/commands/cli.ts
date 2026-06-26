@@ -10,6 +10,7 @@ import { MemoryManager } from "../memory/MemoryManager";
 import * as fs from "fs";
 import * as path from "path";
 
+const pkg = require('../../package.json');
 const ARGS = process.argv.slice(2);
 const CMD = ARGS[0];
 
@@ -119,7 +120,7 @@ function cmdInit() {
   const base = path.resolve(process.cwd(), ".agent-hive");
   const dirs = ["tasks", "messages", "logs", "memory", "history", "conversations", "traces", "metrics", "benchmark", "reports"];
   for (const d of dirs) fs.mkdirSync(path.join(base, d), { recursive: true });
-  console.log("  ✓ Agent Hive initialized (v1.0)");
+  console.log(`  ✓ Agent Hive initialized (v${pkg.version})`);
   console.log(`    ${base}/`);
   dirs.forEach((d) => console.log(`    ├── ${d}/`));
 }
@@ -682,7 +683,7 @@ async function cmdSetup() {
 
 function cmdVersion() {
   console.log(`
-  Agent Hive v1.0.0
+  Agent Hive v${pkg.version}
   TypeScript: 5.8.3
   Node.js: ${process.version}
   Platform: ${process.platform} ${process.arch}
@@ -778,7 +779,7 @@ function getArg(args: string[], flag: string): string | undefined {
 
 function printUsage() {
   console.log(`
-  Agent Hive v1.0
+  Agent Hive v${pkg.version}
 
   Quick Start:
     hive setup                        First-time setup
