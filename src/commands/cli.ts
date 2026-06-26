@@ -116,7 +116,7 @@ async function cmdRunWithTask(broker: Broker, task: string) {
 }
 
 function cmdInit() {
-  const base = path.resolve(process.cwd(), ".hive");
+  const base = path.resolve(process.cwd(), ".agent-hive");
   const dirs = ["tasks", "messages", "logs", "memory", "history", "conversations", "traces", "metrics", "benchmark", "reports"];
   for (const d of dirs) fs.mkdirSync(path.join(base, d), { recursive: true });
   console.log("  ✓ Agent Hive initialized (v1.0)");
@@ -291,7 +291,7 @@ async function cmdRun(broker: Broker, args: string[]) {
 }
 
 function cleanTasks() {
-  const tasksDir = path.resolve(process.cwd(), ".hive/tasks");
+  const tasksDir = path.resolve(process.cwd(), ".agent-hive/tasks");
   if (fs.existsSync(tasksDir)) {
     for (const f of fs.readdirSync(tasksDir).filter(f => f.endsWith(".json"))) {
       fs.unlinkSync(path.join(tasksDir, f));
