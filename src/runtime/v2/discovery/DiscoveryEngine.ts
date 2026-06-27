@@ -150,6 +150,12 @@ export class DiscoveryEngine {
   private async handleDiscoveryEvent(event: DiscoveryEvent): Promise<void> {
     console.log(`[Discovery] Event from ${event.source}: ${event.eventType}`);
 
+    // 🛡️ Bot 身份过滤：防止反射型多重死循环
+    if (this.isBotOrigin(event)) {
+      console.log(`[Discovery] 🛡️ Bot origin detected, blocking event: ${event.eventType}`);
+      return;
+    }
+
     // 将事件转换为 Intent
     const intent = await this.convertEventToIntent(event);
     if (!intent) {
@@ -388,6 +394,89 @@ export class DiscoveryEngine {
    */
   getSource(name: string): DiscoverySource | undefined {
     return this.sources.get(name);
+  }
+
+  /**
+   * 🛡️ 检查事件是否来自 Bot
+   * 
+   * 防止反射型多重死循环（Reflective Loop）
+   * 
+   * 如果事件是由 Agent Hive 自己的系统账号（Bot）触发的，
+   * 必须在转换为 Intent 之前将其直接丢弃。
+   */
+  private isBotOrigin(event: DiscoveryEvent): boolean {
+    const payload = event.payload;
+
+    // 1. GitHub Bot 检测
+    if (event.source === DiscoverySourceType.GITHUB) {
+      // 检查 sender.type
+      if (payload?.sender?.type === "Bot") {
+        return true;
+      }
+      // 检查 sender.login 是否包含 [bot]
+      if (payload?.sender?.login?.includes("[bot]")) {
+        return true;
+      }
+      // 检查 sender.login 是否是 Agent Hive 系统账号
+      if (payload?.sender?.login === "agent-hive[bot]" || 
+          payload?.sender?.login === "agent-hive-bot") {
+        return true;
+      }
+    }
+
+    // 2. GitLab Bot 检测
+    if (event.source === DiscoverySourceType.GITLAB) {
+      if (payload?.user?.state === "bot" || payload?.user?.bot === true) {
+        return true;
+      }
+    }
+
+    // 3. Slack Bot 检测
+    if (event.source === DiscoverySourceType.SLACK) {
+      if (payload?.event?.bot_id || payload?.event?.subtype === "bot_message") {
+        return true;
+      }
+    }
+
+    // 4. Discord Bot 检测
+    if (event.source === DiscoverySourceType.DISCORD) {
+      if (payload?.author?.bot === true) {
+        return true;
+      }
+    }
+
+    // 5. Webhook 自定义 Header 检测
+    if (event.source === DiscoverySourceType.WEBHOOK) {
+      // 检查 User-Agent
+      if (event.metadata?.userAgent?.includes("Agent-Hive")) {
+        return true;
+      }
+      // 检查自定义 Header
+      if (event.metadata?.headers?.["x-agent-hive-origin"]) {
+        return true;
+      }
+    }
+
+    // 6. REST API 检测
+    if (event.source === DiscoverySourceType.REST_API) {
+      if (event.metadata?.userAgent?.includes("Agent-Hive")) {
+        return true;
+      }
+    }
+
+    // 7. 通用 Bot 检测：检查 metadata 中的 bot 标记
+    if (event.metadata?.bot === true || event.metadata?.automated === true) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 添加自定义 Bot 检测规则
+   */
+  addBotDetectionRule(rule: (event: DiscoveryEvent) => boolean): void {
+    // TODO: 实现可扩展的规则系统
   }
 
   /**
