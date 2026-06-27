@@ -159,3 +159,29 @@ export {
   ProviderManager,
   globalProviderManager
 } from "./provider/ProviderManager";
+
+// 审计追踪
+export {
+  AuditEventType,
+  AuditEvent,
+  AuditQuery,
+  AuditStats,
+  AuditTrail
+} from "./audit/AuditTrail";
+
+// 并发管理
+export {
+  LockType,
+  LockInfo,
+  TenantInfo,
+  ConcurrencyConfig,
+  ConcurrencyManager
+} from "./concurrency/ConcurrencyManager";
+
+// 水合引擎
+export {
+  HydrationStatus,
+  HydrationResult,
+  RecoveryStrategy,
+  HydrationEngine
+} from "./hydration/HydrationEngine";
