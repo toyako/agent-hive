@@ -122,3 +122,40 @@ export {
   WorkspaceSandbox,
   WorkspaceIsolation
 } from "./isolation/WorkspaceIsolation";
+
+// Provider 插件系统
+export {
+  ProviderType,
+  ProviderConfig,
+  ProviderCapability,
+  ChatMessage,
+  ChatOptions,
+  ChatResponse,
+  CompletionOptions,
+  CompletionResponse,
+  Provider,
+  ProviderRegistration,
+  ProviderRegistry,
+  globalProviderRegistry
+} from "./provider/ProviderRegistry";
+
+export {
+  OpenAICompatibleProvider,
+  registerOpenAIProvider
+} from "./provider/OpenAIProvider";
+
+export {
+  AnthropicProvider,
+  registerAnthropicProvider
+} from "./provider/AnthropicProvider";
+
+export {
+  GoogleProvider,
+  registerGoogleProvider
+} from "./provider/GoogleProvider";
+
+export {
+  ProviderSelectionStrategy,
+  ProviderManager,
+  globalProviderManager
+} from "./provider/ProviderManager";
