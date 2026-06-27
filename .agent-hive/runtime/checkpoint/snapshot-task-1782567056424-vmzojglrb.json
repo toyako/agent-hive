@@ -1,0 +1,13 @@
+{
+  "id": "snapshot-task-1782567056424-vmzojglrb-1782567056425",
+  "taskId": "task-1782567056424-vmzojglrb",
+  "createdAt": 1782567056428,
+  "directory": "/tmp/grand-review",
+  "files": [
+    "package.json",
+    "src/auth.js",
+    "src/auth.test.js",
+    "test-grand-review.js"
+  ],
+  "checksum": "ae00bb3776b9f8610d48f599458b8371"
+}

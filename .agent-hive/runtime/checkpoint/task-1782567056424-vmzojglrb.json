@@ -1,0 +1,24 @@
+{
+  "taskId": "task-1782567056424-vmzojglrb",
+  "status": "pending",
+  "createdAt": 1782567056477,
+  "updatedAt": 1782567056477,
+  "taskGoal": "Fix SQL Injection vulnerability in auth.js",
+  "taskState": "RUNNING",
+  "changes": {
+    "filesChanged": [],
+    "linesAdded": 0,
+    "linesRemoved": 0,
+    "summary": "No changes recorded"
+  },
+  "evaluatorResult": null,
+  "suspendReason": "Error: Lint error: SQL injection vulnerability detected",
+  "recoveryHistory": [],
+  "budgetConsumption": {
+    "tokensUsed": 0,
+    "costIncurred": 0,
+    "retryCount": 1,
+    "runtimeElapsed": 0,
+    "timestamp": 1782567056472
+  }
+}

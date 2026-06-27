@@ -1,0 +1,8 @@
+{
+  "name": "test-auth-module",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src/"
+  }
+}

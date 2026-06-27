@@ -1,0 +1,10 @@
+{
+  "id": "snapshot-task-1782567218044-r9j58nsum-1782567218045",
+  "taskId": "task-1782567218044-r9j58nsum",
+  "createdAt": 1782567218047,
+  "directory": "/tmp/grand-review/test-workspace",
+  "files": [
+    "auth.js"
+  ],
+  "checksum": "874cb0ec986b7d8f74fd9df0c0343007"
+}
