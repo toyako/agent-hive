@@ -84,3 +84,27 @@ export {
   PersistedState,
   PersistenceEngine
 } from "./persistence/PersistenceEngine";
+
+// 预算守卫
+export {
+  BudgetLimits,
+  BudgetConsumption,
+  BudgetState,
+  BudgetGuard
+} from "./budget/BudgetGuard";
+
+// 恢复引擎
+export {
+  RecoveryAction,
+  RecoveryConfig,
+  RecoveryRecord,
+  RecoveryEngine
+} from "./recovery/RecoveryEngine";
+
+// 人工检查点
+export {
+  CheckpointStatus,
+  ChangeDiff,
+  CheckpointSnapshot,
+  HumanCheckpointManager
+} from "./checkpoint/HumanCheckpoint";
