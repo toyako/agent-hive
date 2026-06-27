@@ -1,0 +1,50 @@
+{
+  "taskId": "task-1782561318850-fqy5h4dj0",
+  "status": "pending",
+  "createdAt": 1782561318854,
+  "updatedAt": 1782561318854,
+  "taskGoal": "Build a hello world function",
+  "taskState": "FAILED",
+  "changes": {
+    "filesChanged": [],
+    "linesAdded": 0,
+    "linesRemoved": 0,
+    "summary": "No changes recorded"
+  },
+  "evaluatorResult": {
+    "verdict": "REJECT",
+    "score": 0,
+    "checks": [
+      {
+        "name": "lint",
+        "passed": true,
+        "message": "Lint check passed"
+      },
+      {
+        "name": "typecheck",
+        "passed": true,
+        "message": "Type check passed"
+      },
+      {
+        "name": "unittest",
+        "passed": true,
+        "message": "Unit tests passed"
+      },
+      {
+        "name": "security",
+        "passed": false,
+        "message": "Security risk: contains sensitive keyword 'token'"
+      }
+    ],
+    "timestamp": 1782561318853
+  },
+  "suspendReason": "Verification rejected: score 0",
+  "recoveryHistory": [],
+  "budgetConsumption": {
+    "tokensUsed": 100,
+    "costIncurred": 0.01,
+    "retryCount": 0,
+    "runtimeElapsed": 0,
+    "timestamp": 1782561318852
+  }
+}

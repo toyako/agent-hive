@@ -91,17 +91,42 @@ export class SecurityScanEvaluationNode implements EvaluationNode {
   async evaluate(taskId: string, result: any, context?: RuntimeContext): Promise<EvaluationNodeResult> {
     // 检查是否包含敏感信息
     if (typeof result === "object" && result !== null) {
-      const resultStr = JSON.stringify(result).toLowerCase();
-      const sensitivePatterns = ["password", "secret", "key", "token", "credential"];
+      // 只检查字符串值，不检查数字或布尔值
+      const checkValue = (key: string, value: any): boolean => {
+        if (typeof value !== "string") return false;
+        const lowerValue = value.toLowerCase();
+        const sensitivePatterns = ["password", "secret", "api_key", "apikey", "credential", "private_key"];
+        return sensitivePatterns.some(pattern => lowerValue.includes(pattern));
+      };
 
-      for (const pattern of sensitivePatterns) {
-        if (resultStr.includes(pattern)) {
-          return {
-            passed: false,
-            score: 0,
-            message: `Security risk: contains sensitive keyword '${pattern}'`
-          };
+      // 递归检查对象
+      const checkObject = (obj: any, path: string = ""): boolean => {
+        for (const [key, value] of Object.entries(obj)) {
+          const currentPath = path ? `${path}.${key}` : key;
+          
+          // 跳过数字、布尔值和常见的非敏感字段
+          if (typeof value === "number" || typeof value === "boolean") continue;
+          if (["tokensUsed", "costIncurred", "retryCount", "runtimeElapsed", "timestamp", "score"].includes(key)) continue;
+          
+          if (checkValue(key, value)) {
+            return true;
+          }
+          
+          if (typeof value === "object" && value !== null) {
+            if (checkObject(value, currentPath)) {
+              return true;
+            }
+          }
         }
+        return false;
+      };
+
+      if (checkObject(result)) {
+        return {
+          passed: false,
+          score: 0,
+          message: "Security risk: contains sensitive information"
+        };
       }
     }
 

@@ -1,0 +1,24 @@
+{
+  "taskId": "task-1782561125960-o9kjl8iv4",
+  "status": "pending",
+  "createdAt": 1782561125963,
+  "updatedAt": 1782561125963,
+  "taskGoal": "Task that will fail",
+  "taskState": "RUNNING",
+  "changes": {
+    "filesChanged": [],
+    "linesAdded": 0,
+    "linesRemoved": 0,
+    "summary": "No changes recorded"
+  },
+  "evaluatorResult": null,
+  "suspendReason": "Error: Simulated failure",
+  "recoveryHistory": [],
+  "budgetConsumption": {
+    "tokensUsed": 0,
+    "costIncurred": 0,
+    "retryCount": 1,
+    "runtimeElapsed": 0,
+    "timestamp": 1782561125961
+  }
+}

@@ -108,3 +108,10 @@ export {
   CheckpointSnapshot,
   HumanCheckpointManager
 } from "./checkpoint/HumanCheckpoint";
+
+// 工作流桥接
+export {
+  WorkflowExecutionResult,
+  RuntimeWorkflowConfig,
+  RuntimeWorkflowBridge
+} from "./workflow/RuntimeWorkflowBridge";
