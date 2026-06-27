@@ -68,3 +68,19 @@ export {
   ScheduledTask,
   SchedulerEngine
 } from "./scheduler/SchedulerEngine";
+
+// 能力注册表
+export {
+  CapabilityType,
+  AgentCapability,
+  AgentRegistration,
+  AgentStatus,
+  CapabilityRegistry
+} from "./capability/CapabilityRegistry";
+
+// 持久化引擎
+export {
+  PersistenceConfig,
+  PersistedState,
+  PersistenceEngine
+} from "./persistence/PersistenceEngine";
