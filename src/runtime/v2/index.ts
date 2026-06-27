@@ -5,7 +5,7 @@
  */
 
 // 核心
-export { RuntimeCore, RuntimeConfig } from "./RuntimeCore";
+export { RuntimeCore, RuntimeConfig, Verdict, VerificationResult, EvaluatorPipeline } from "./RuntimeCore";
 
 // 状态机
 export { RuntimeStateMachine, RuntimeState, RuntimeContext, RuntimeStateTransition } from "./state-machine/RuntimeStateMachine";
