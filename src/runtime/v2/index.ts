@@ -52,3 +52,19 @@ export {
   ReviewerEvaluationNode,
   DefaultEvaluatorPipeline
 } from "./evaluator/EvaluatorPipeline";
+
+// 发现引擎
+export {
+  DiscoverySourceType,
+  DiscoveryEvent,
+  DiscoverySource,
+  Intent,
+  DiscoveryEngine
+} from "./discovery/DiscoveryEngine";
+
+// 调度引擎
+export {
+  ScheduleType,
+  ScheduledTask,
+  SchedulerEngine
+} from "./scheduler/SchedulerEngine";
