@@ -23,6 +23,7 @@ import { HumanCheckpointManager, ChangeDiff } from "../checkpoint/HumanCheckpoin
 import { PersistenceEngine } from "../persistence/PersistenceEngine";
 import { CapabilityRegistry, CapabilityType } from "../capability/CapabilityRegistry";
 import { EventBus, RuntimeEventType, globalEventBus } from "../observation/EventBus";
+import { WorkspaceIsolation } from "../isolation/WorkspaceIsolation";
 
 // 工作流执行结果
 export interface WorkflowExecutionResult {
@@ -54,6 +55,7 @@ export class RuntimeWorkflowBridge {
   private checkpoint: HumanCheckpointManager;
   private persistence: PersistenceEngine;
   private capabilityRegistry: CapabilityRegistry;
+  private workspaceIsolation: WorkspaceIsolation;
   private eventBus: EventBus;
   private config: RuntimeWorkflowConfig;
 
@@ -73,6 +75,7 @@ export class RuntimeWorkflowBridge {
     this.evaluator = options.evaluator || new DefaultEvaluatorPipeline();
     this.persistence = options.persistence || new PersistenceEngine();
     this.capabilityRegistry = options.capabilityRegistry || new CapabilityRegistry();
+    this.workspaceIsolation = new WorkspaceIsolation(this.persistence);
     this.eventBus = runtime.getEventBus();
     this.config = {
       enablePolicyCheck: true,
@@ -156,9 +159,11 @@ export class RuntimeWorkflowBridge {
       requiredSkills?: CapabilityType[];
       changes?: ChangeDiff;
       metadata?: Record<string, any>;
+      workspaceDir?: string;  // 工作区目录
     } = {}
   ): Promise<WorkflowExecutionResult> {
     const startTime = Date.now();
+    const workspaceDir = options.workspaceDir || process.cwd();
 
     // 1. 发现任务
     const task = await this.runtime.discoverTask(goal, {
@@ -166,6 +171,13 @@ export class RuntimeWorkflowBridge {
       metadata: options.metadata
     });
     const taskId = task.id;
+
+    // 2. 创建工作区快照（Handoff Isolation）
+    await this.workspaceIsolation.createSnapshot(taskId, workspaceDir);
+
+    // 3. 创建工作区沙箱
+    const sandbox = await this.workspaceIsolation.createSandbox(taskId, workspaceDir);
+    const sandboxDir = sandbox.sandboxDir;
 
     try {
       // 2. Policy 检查
@@ -202,18 +214,24 @@ export class RuntimeWorkflowBridge {
       await this.runtime.enqueueTask(taskId);
       await this.runtime.executeTask(taskId);
 
-      // 5. 执行任务
+      // 5. 执行任务（在沙箱中执行）
       let output: any;
       let retryCount = 0;
       let success = false;
 
       while (retryCount <= this.config.maxRetries && !success) {
         try {
+          // 🚨 重试时强制回滚（Rollback on Retry）
+          if (retryCount > 0) {
+            console.log(`[WorkflowBridge] 🔄 Rolling back sandbox for retry ${retryCount}`);
+            await this.workspaceIsolation.rollbackSandbox(taskId);
+          }
+
           // 记录执行开始
           this.budgetGuard.recordConsumption(taskId, { runtimeElapsed: 0 });
 
-          // 执行任务
-          output = await executor(task);
+          // 执行任务（在沙箱目录中）
+          output = await executor({ ...task, metadata: { ...task.metadata, workingDirectory: sandboxDir } });
 
           // 记录执行完成
           this.budgetGuard.recordConsumption(taskId, { 
@@ -245,6 +263,9 @@ export class RuntimeWorkflowBridge {
           }
         }
       }
+
+      // 销毁沙箱
+      await this.workspaceIsolation.destroySandbox(taskId);
 
       if (!success) {
         await this.runtime.failTask(taskId, `Failed after ${retryCount} retries`);

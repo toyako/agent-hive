@@ -115,3 +115,10 @@ export {
   RuntimeWorkflowConfig,
   RuntimeWorkflowBridge
 } from "./workflow/RuntimeWorkflowBridge";
+
+// 工作区隔离
+export {
+  WorkspaceSnapshot,
+  WorkspaceSandbox,
+  WorkspaceIsolation
+} from "./isolation/WorkspaceIsolation";
