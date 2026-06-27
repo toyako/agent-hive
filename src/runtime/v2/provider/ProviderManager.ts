@@ -114,10 +114,7 @@ export class ProviderManager {
    * 按能力查找 Provider
    */
   findProvidersByCapability(capability: ProviderCapability): Provider[] {
-    const registrations = this.registry.findProvidersByCapability(capability);
-    return registrations
-      .map(reg => this.registry.getProvider(reg.name))
-      .filter((p): p is Provider => p !== undefined);
+    return this.registry.findProvidersByCapability(capability);
   }
 
   /**

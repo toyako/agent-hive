@@ -172,9 +172,24 @@ export class ProviderRegistry {
   }
 
   /**
-   * 按能力查找 Provider
+   * 按能力查找 Provider（搜索活跃实例）
    */
-  findProvidersByCapability(capability: ProviderCapability): ProviderRegistration[] {
+  findProvidersByCapability(capability: ProviderCapability): Provider[] {
+    const result: Provider[] = [];
+    
+    for (const [name, provider] of this.providers) {
+      if (provider.capabilities.includes(capability)) {
+        result.push(provider);
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * 按能力查找注册信息
+   */
+  findRegistrationsByCapability(capability: ProviderCapability): ProviderRegistration[] {
     return Array.from(this.registrations.values())
       .filter(reg => reg.capabilities.includes(capability));
   }
