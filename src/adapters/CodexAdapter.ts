@@ -3,6 +3,7 @@ import * as path from "path";
 import OpenAI from "openai";
 import { AgentAdapter, AgentResult, ReviewResult, Task } from "../types";
 import { extractJson, normalizeText } from "../utils/OutputNormalizer";
+import { loadAdapterConfig } from "../runtime/RuntimeConfig";
 
 const REVIEWER_PROMPT = fs.readFileSync(path.join(__dirname, "../prompts/reviewer.txt"), "utf-8");
 
@@ -13,21 +14,7 @@ const HEALTH_PROMPT = `Create JSON:
 Return JSON only.`;
 
 function loadConfig(): { apiKey: string; baseURL: string; model: string } {
-  const configPath = path.resolve(process.cwd(), "runtime.json");
-  let apiKey = process.env.OPENAI_API_KEY || "";
-  let baseURL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
-  let model = process.env.CODEX_MODEL || "mimo-v2.5-pro";
-
-  if (fs.existsSync(configPath)) {
-    try {
-      const cfg = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      if (cfg.codex?.env?.OPENAI_API_KEY) apiKey = cfg.codex.env.OPENAI_API_KEY;
-      if (cfg.codex?.env?.OPENAI_BASE_URL) baseURL = cfg.codex.env.OPENAI_BASE_URL;
-      if (cfg.codex?.model) model = cfg.codex.model;
-    } catch {}
-  }
-
-  return { apiKey, baseURL, model };
+  return loadAdapterConfig("codex", "OPENAI");
 }
 
 export class CodexAdapter implements AgentAdapter {

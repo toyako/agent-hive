@@ -4,6 +4,7 @@ import * as fs from "fs";
 import OpenAI from "openai";
 import { AgentAdapter, AgentResult, ReviewResult, Task, MessageEnvelope } from "../types";
 import { extractJson, normalizeText } from "../utils/OutputNormalizer";
+import { loadAdapterConfig } from "../runtime/RuntimeConfig";
 
 const CLAUDE_BIN = findBinary("claude");
 
@@ -22,22 +23,7 @@ function findBinary(name: string): string {
 }
 
 function loadRuntimeConfig(): { model: string; apiKey: string; baseURL: string } {
-  try {
-    const runtimePath = path.join(__dirname, "../../runtime.json");
-    const runtime = JSON.parse(fs.readFileSync(runtimePath, "utf-8"));
-    const cfg = runtime?.claude || {};
-    return {
-      model: cfg.model || "mimo-v2.5-pro",
-      apiKey: cfg.env?.ANTHROPIC_API_KEY || cfg.env?.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || "",
-      baseURL: cfg.env?.ANTHROPIC_BASE_URL || cfg.env?.OPENAI_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.OPENAI_BASE_URL || "",
-    };
-  } catch {
-    return {
-      model: process.env.CLAUDE_MODEL || "mimo-v2.5-pro",
-      apiKey: process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || "",
-      baseURL: process.env.ANTHROPIC_BASE_URL || process.env.OPENAI_BASE_URL || "",
-    };
-  }
+  return loadAdapterConfig("claude", "ANTHROPIC");
 }
 
 function createClient(): OpenAI {

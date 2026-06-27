@@ -4,6 +4,7 @@ import * as fs from "fs";
 import OpenAI from "openai";
 import { AgentAdapter, AgentResult, ReviewResult, Task, MessageEnvelope } from "../types";
 import { extractJson, normalizeText } from "../utils/OutputNormalizer";
+import { loadAdapterConfig } from "../runtime/RuntimeConfig";
 
 const HERMES_BIN = findBinary("hermes");
 
@@ -18,22 +19,7 @@ function findBinary(name: string): string {
 }
 
 function loadRuntimeConfig(): { model: string; apiKey: string; baseURL: string } {
-  try {
-    const runtimePath = path.join(__dirname, "../../runtime.json");
-    const runtime = JSON.parse(fs.readFileSync(runtimePath, "utf-8"));
-    const cfg = runtime?.hermes || {};
-    return {
-      model: cfg.model || "mimo-v2.5-pro",
-      apiKey: cfg.env?.OPENAI_API_KEY || process.env.OPENAI_API_KEY || "",
-      baseURL: cfg.env?.OPENAI_BASE_URL || process.env.OPENAI_BASE_URL || "",
-    };
-  } catch {
-    return {
-      model: process.env.HERMES_MODEL || "mimo-v2.5-pro",
-      apiKey: process.env.OPENAI_API_KEY || "",
-      baseURL: process.env.OPENAI_BASE_URL || "",
-    };
-  }
+  return loadAdapterConfig("hermes", "OPENAI");
 }
 
 function createClient(): OpenAI {
