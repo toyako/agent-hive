@@ -73,3 +73,11 @@ export {
   CutoverReport,
   CutoverGate
 } from "./validation/CutoverGate";
+
+// DER (Deterministic Evaluation Runtime)
+export {
+  RunRecord,
+  TraceRecord,
+  VerificationResult,
+  DER
+} from "./der/DER";
