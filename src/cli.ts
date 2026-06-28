@@ -1,23 +1,21 @@
 #!/usr/bin/env node
 
 /**
- * Hive CLI — Deterministic Runtime Verification CLI Tool (v2.2)
+ * Hive CLI — Agent Runtime + Deterministic Verification CLI Tool (v2.3)
  * 
  * Usage:
- *   hive run <task>            Execute task with Runtime Core
+ *   hive run <task>            Execute task with Runtime v2 (DAG-based)
  *   hive agent list            List all agents
- *   hive test <input> [n]      Stress test (default n=1000)
- *   hive chaos <input> [n]     Chaos test
+ *   hive test <input> [n]      Stress test
  *   hive validate <input>      Final verdict (CI-friendly)
  *   hive ci gate               CI Gate Aggregator
  *   hive contract freeze       Freeze Determinism Contract
- *   hive contract validate     Validate Determinism Contract
  */
 
 import { validate, stress, chaos } from "./validate";
 import { CIGate } from "./ci/CIGate";
 import { ContractLock } from "./ci/ContractLock";
-import { RuntimeCore } from "./runtime-core";
+import { RuntimeV2 } from "./runtime-v2";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -25,7 +23,7 @@ const input = process.argv[4];
 const n = Number(process.argv[5] || 1000);
 
 async function main() {
-  const runtime = new RuntimeCore();
+  const runtime = new RuntimeV2();
 
   switch (cmd) {
     case "run": {
@@ -38,7 +36,6 @@ async function main() {
       switch (subcmd) {
         case "list":
           console.log("Agents:", runtime.listAgents());
-          console.log("Tools:", runtime.listTools());
           break;
         default:
           console.log("Usage: hive agent list");
@@ -118,10 +115,10 @@ async function main() {
 
     default:
       console.log(`
-Hive — Agent Runtime + Deterministic Verification CLI Tool
+Hive — DAG-based Multi-Agent Execution Runtime System
 
-Runtime Core Commands:
-  hive run <task>            Execute task with Runtime Core
+Runtime v2 Commands:
+  hive run <task>            Execute task (DAG-based)
   hive agent list            List all agents
 
 Determinism Commands:
@@ -138,7 +135,6 @@ Examples:
   hive run "build a REST API"
   hive agent list
   hive validate "hello"
-  hive ci gate
       `);
   }
 }
