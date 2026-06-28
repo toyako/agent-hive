@@ -1,24 +1,21 @@
 {
-  "name": "@toyako/agent-hive",
-  "version": "2.0.0",
-  "description": "Multi-Runtime Agent Orchestration Framework",
-  "main": "dist/commands/cli.js",
+  "name": "@toyako/hive",
+  "version": "2.1.0",
+  "description": "Deterministic Runtime Verification CLI Tool",
+  "main": "dist/index.js",
   "bin": {
-    "hive": "./dist/commands/cli.js"
+    "hive": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc && cp -r src/prompts dist/prompts",
-    "start": "node dist/commands/cli.js",
-    "demo": "node dist/commands/demo.js"
+    "build": "tsc",
+    "test": "node dist/cli.js validate test"
   },
   "keywords": [
-    "ai",
-    "agent",
-    "multi-runtime",
-    "orchestration",
-    "claude",
-    "codex",
-    "llm"
+    "deterministic",
+    "runtime",
+    "verification",
+    "cli",
+    "hive"
   ],
   "author": "toyako",
   "license": "MIT",
@@ -29,27 +26,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
     "@google/generative-ai": "^0.24.1",
-    "openai": "^6.42.0",
-    "xstate": "^5.20.0"
-  },
-  "files": [
-    "dist/",
-    "README.md",
-    "README.zh-CN.md",
-    "README.ja.md",
-    "README.es.md",
-    "LICENSE",
-    "CHANGELOG.md",
-    "runtime.json.example"
-  ],
-  "engines": {
-    "node": ">=18"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/toyako/agent-hive.git"
-  },
-  "publishConfig": {
-    "access": "public"
+    "openai": "^4.78.0",
+    "xstate": "^4.38.3"
   }
 }
