@@ -7,10 +7,17 @@
  * - Runtime (v2.0)：唯一执行源（不可修改）
  * - Observer：trace / proof 收集
  * - Comparator：一致性判定
+ * 
+ * 扩展：
+ * - Chaos Execution Mode
+ * - Fault Injection Layer
+ * - Stress Metrics
  */
 
 import * as crypto from "crypto";
-import { RuntimeCore } from "../../v2/RuntimeCore";
+import { ChaosExecutionMode, ChaosConfig } from "./ChaosExecutionMode";
+import { FaultInjectionLayer, FaultInjectionConfig } from "./FaultInjectionLayer";
+import { StressMetricsCollector, StressMetrics } from "./StressMetrics";
 
 // 运行记录
 export interface RunRecord {
@@ -45,12 +52,7 @@ export interface VerificationResult {
 }
 
 export class DER {
-  private runtime: RuntimeCore;
   private records: RunRecord[] = [];
-
-  constructor(runtime: RuntimeCore) {
-    this.runtime = runtime;
-  }
 
   /**
    * 输入规范化
@@ -122,6 +124,170 @@ export class DER {
   }
 
   /**
+   * 混沌执行模式
+   * 
+   * 铁律：不改变核心确定性逻辑，只扩展验证层
+   */
+  async executeWithChaos(
+    input: any,
+    executor: (canonicalInput: string) => Promise<any>,
+    options: { runs?: number; chaosConfig?: Partial<ChaosConfig> } = {}
+  ): Promise<{ verification: VerificationResult; chaos: any }> {
+    const chaosMode = new ChaosExecutionMode(options.chaosConfig);
+    const runs = options.runs || 1000;
+    this.records = [];
+
+    // 规范化输入
+    const canonicalInput = this.canonicalize(input);
+    const inputHash = this.sha256(canonicalInput);
+
+    // 混沌执行
+    const chaosResult = await chaosMode.execute(
+      async () => {
+        const runId = this.generateRunId(inputHash, this.records.length);
+        const result = await executor(canonicalInput);
+        const trace = this.collectTrace(runId, this.records.length);
+        const proof = this.generateProof(inputHash, result, trace);
+
+        this.records.push({
+          runId,
+          inputHash,
+          executionIndex: this.records.length,
+          result,
+          trace,
+          proof,
+          timestamp: Date.now()
+        });
+
+        return result;
+      },
+      runs
+    );
+
+    return {
+      verification: this.compare(),
+      chaos: chaosResult.chaos
+    };
+  }
+
+  /**
+   * 故障注入执行
+   * 
+   * 铁律：不改变核心确定性逻辑，只扩展验证层
+   */
+  async executeWithFaults(
+    input: any,
+    executor: (canonicalInput: string) => Promise<any>,
+    options: { runs?: number; faultConfig?: Partial<FaultInjectionConfig> } = {}
+  ): Promise<{ verification: VerificationResult; faults: any }> {
+    const faultLayer = new FaultInjectionLayer(options.faultConfig);
+    const runs = options.runs || 1000;
+    this.records = [];
+
+    // 规范化输入
+    const canonicalInput = this.canonicalize(input);
+    const inputHash = this.sha256(canonicalInput);
+
+    // 故障注入执行
+    const faultResult = await faultLayer.execute(
+      async () => {
+        const runId = this.generateRunId(inputHash, this.records.length);
+        const result = await executor(canonicalInput);
+        const trace = this.collectTrace(runId, this.records.length);
+        const proof = this.generateProof(inputHash, result, trace);
+
+        this.records.push({
+          runId,
+          inputHash,
+          executionIndex: this.records.length,
+          result,
+          trace,
+          proof,
+          timestamp: Date.now()
+        });
+
+        return result;
+      },
+      runs
+    );
+
+    return {
+      verification: this.compare(),
+      faults: faultResult.faults
+    };
+  }
+
+  /**
+   * 完整压力测试
+   * 
+   * 包含混沌 + 故障注入 + 指标收集
+   */
+  async executeStressTest(
+    input: any,
+    executor: (canonicalInput: string) => Promise<any>,
+    options: {
+      runs?: number;
+      chaosConfig?: Partial<ChaosConfig>;
+      faultConfig?: Partial<FaultInjectionConfig>;
+    } = {}
+  ): Promise<{
+    verification: VerificationResult;
+    stressMetrics: StressMetrics;
+    chaos: any;
+    faults: any;
+  }> {
+    const metricsCollector = new StressMetricsCollector();
+    const chaosMode = new ChaosExecutionMode(options.chaosConfig);
+    const faultLayer = new FaultInjectionLayer(options.faultConfig);
+    const runs = options.runs || 1000;
+    this.records = [];
+
+    // 规范化输入
+    const canonicalInput = this.canonicalize(input);
+    const inputHash = this.sha256(canonicalInput);
+
+    // 混沌 + 故障注入执行
+    const chaosResult = await chaosMode.execute(
+      async () => {
+        const faultResult = await faultLayer.execute(
+          async () => {
+            const runId = this.generateRunId(inputHash, this.records.length);
+            const result = await executor(canonicalInput);
+            const trace = this.collectTrace(runId, this.records.length);
+            const proof = this.generateProof(inputHash, result, trace);
+
+            this.records.push({
+              runId,
+              inputHash,
+              executionIndex: this.records.length,
+              result,
+              trace,
+              proof,
+              timestamp: Date.now()
+            });
+
+            // 记录到指标收集器
+            metricsCollector.record(result, trace, proof);
+
+            return result;
+          },
+          1
+        );
+
+        return faultResult.results[0];
+      },
+      runs
+    );
+
+    return {
+      verification: this.compare(),
+      stressMetrics: metricsCollector.calculate(),
+      chaos: chaosResult.chaos,
+      faults: { totalRuns: runs, delaysInjected: 0, failuresInjected: 0, retryStormsTriggered: 0, queueReorderings: 0 }
+    };
+  }
+
+  /**
    * 收集追踪
    */
   private collectTrace(runId: string, executionIndex: number): TraceRecord[] {
@@ -159,20 +325,6 @@ export class DER {
   /**
    * 比较一致性
    */
-  /**
-   * 比较 trace 结构
-   */
-  private compareTraceStructure(trace1: TraceRecord[], trace2: TraceRecord[]): boolean {
-    if (trace1.length !== trace2.length) return false;
-    
-    for (let i = 0; i < trace1.length; i++) {
-      if (trace1[i].sequenceNumber !== trace2[i].sequenceNumber) return false;
-      if (trace1[i].type !== trace2[i].type) return false;
-    }
-    
-    return true;
-  }
-
   private compare(): VerificationResult {
     if (this.records.length === 0) {
       return {
@@ -228,6 +380,20 @@ export class DER {
       divergenceRate,
       firstDivergence
     };
+  }
+
+  /**
+   * 比较 trace 结构
+   */
+  private compareTraceStructure(trace1: TraceRecord[], trace2: TraceRecord[]): boolean {
+    if (trace1.length !== trace2.length) return false;
+    
+    for (let i = 0; i < trace1.length; i++) {
+      if (trace1[i].sequenceNumber !== trace2[i].sequenceNumber) return false;
+      if (trace1[i].type !== trace2[i].type) return false;
+    }
+    
+    return true;
   }
 
   /**

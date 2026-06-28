@@ -81,3 +81,21 @@ export {
   VerificationResult,
   DER
 } from "./der/DER";
+
+// DER Extensions
+export {
+  ChaosConfig,
+  ChaosResult,
+  ChaosExecutionMode
+} from "./der/ChaosExecutionMode";
+
+export {
+  FaultInjectionConfig,
+  FaultInjectionResult,
+  FaultInjectionLayer
+} from "./der/FaultInjectionLayer";
+
+export {
+  StressMetrics,
+  StressMetricsCollector
+} from "./der/StressMetrics";
