@@ -34,6 +34,7 @@ export interface WorkflowExecutionResult {
   verificationResult?: VerificationResult;
   state: RuntimeState;
   duration: number;
+  metadata?: Record<string, any>;  // TD-3: 支持 error.stack 等元数据
 }
 
 // 工作流配置
@@ -240,24 +241,39 @@ export class RuntimeWorkflowBridge {
           });
 
           success = true;
-        } catch (error) {
+        } catch (error: any) {
           retryCount++;
-          console.error(`[WorkflowBridge] Execution error (attempt ${retryCount}):`, error);
+          
+          // 🚨 TD-3 Fix: error.stack 全量透传
+          const errorInfo = {
+            message: error.message || String(error),
+            stack: error.stack || 'No stack trace available',
+            name: error.name || 'Error',
+            timestamp: Date.now()
+          };
+          
+          console.error(`[WorkflowBridge] Execution error (attempt ${retryCount}):`, errorInfo.message);
 
           // 记录重试
           this.budgetGuard.recordRetry(taskId);
 
           // 尝试恢复
           if (this.config.enableRecovery && retryCount <= this.config.maxRetries) {
-            const recoveryAction = await this.recovery.attemptRecovery(taskId, String(error));
+            const recoveryAction = await this.recovery.attemptRecovery(taskId, errorInfo.message);
             if (recoveryAction === RecoveryAction.ESCALATE) {
-              // 升级到人工
+              // 升级到人工 - 全量透传错误信息
               return {
                 taskId,
                 success: false,
-                error: `Escalated to human after ${retryCount} retries`,
+                error: errorInfo.message,
                 state: RuntimeState.WAITING_CHECKPOINT,
-                duration: Date.now() - startTime
+                duration: Date.now() - startTime,
+                metadata: {
+                  errorStack: errorInfo.stack,
+                  errorName: errorInfo.name,
+                  retryCount,
+                  escalatedAt: Date.now()
+                }
               };
             }
           }

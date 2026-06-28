@@ -14,6 +14,10 @@ import { RuntimeState, RuntimeContext, RuntimeStateMachine } from "../state-mach
 import { PersistenceEngine, PersistedState } from "../persistence/PersistenceEngine";
 import { EventBus, RuntimeEventType, globalEventBus } from "../observation/EventBus";
 
+// 版本号从 package.json 读取
+const pkgPath = path.resolve(process.cwd(), "package.json");
+const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+
 // 水合状态
 export enum HydrationStatus {
   SUCCESS = "success",
@@ -251,7 +255,7 @@ export class HydrationEngine {
       if (!context) return false;
 
       const state: PersistedState = {
-        version: "1.0",
+        version: pkg.version,
         timestamp: Date.now(),
         contexts: { [taskId]: context },
         queue: [],
