@@ -18,6 +18,7 @@ import { ContractLock } from "./ci/ContractLock";
 import { RuntimeV2 } from "./runtime-v2";
 import { LoopController } from "./loop-layer/LoopController";
 import { SelfHealingRuntime } from "./self-healing/SelfHealingRuntime";
+import { ProductionRuntime } from "./production/ProductionRuntime";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -28,6 +29,39 @@ async function main() {
   const runtime = new RuntimeV2();
 
   switch (cmd) {
+    case "production": {
+      const prodRuntime = new ProductionRuntime();
+      const result = await prodRuntime.execute(subcmd || "hello");
+      console.log(JSON.stringify(result, null, 2));
+      break;
+    }
+
+    case "checkpoint": {
+      const prodRuntime = new ProductionRuntime();
+      const result = await prodRuntime.execute(input || "hello");
+      console.log("Checkpoint:", result.checkpoint?.id);
+      break;
+    }
+
+    case "events": {
+      const prodRuntime = new ProductionRuntime();
+      await prodRuntime.execute(input || "hello");
+      console.log("Events:", prodRuntime.getEventStore().getAllEvents().length);
+      break;
+    }
+
+    case "scheduler": {
+      const prodRuntime = new ProductionRuntime();
+      console.log("Jobs:", prodRuntime.getScheduler().getJobs().length);
+      break;
+    }
+
+    case "plugins": {
+      const prodRuntime = new ProductionRuntime();
+      console.log("Plugins:", prodRuntime.getPluginRegistry().getAll().length);
+      break;
+    }
+
     case "self-heal": {
       const selfHealing = new SelfHealingRuntime(Number(subcmd) || 5);
       const result = await selfHealing.execute(input || "hello");
