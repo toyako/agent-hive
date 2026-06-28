@@ -17,6 +17,7 @@ import { CIGate } from "./ci/CIGate";
 import { ContractLock } from "./ci/ContractLock";
 import { RuntimeV2 } from "./runtime-v2";
 import { LoopController } from "./loop-layer/LoopController";
+import { SelfHealingRuntime } from "./self-healing/SelfHealingRuntime";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -27,6 +28,18 @@ async function main() {
   const runtime = new RuntimeV2();
 
   switch (cmd) {
+    case "self-heal": {
+      const selfHealing = new SelfHealingRuntime(Number(subcmd) || 5);
+      const result = await selfHealing.execute(input || "hello");
+      console.log(JSON.stringify({
+        success: result.success,
+        iterations: result.iterations,
+        finalEvaluation: result.finalEvaluation,
+        traceTimeline: result.trace.formatTimeline()
+      }, null, 2));
+      break;
+    }
+
     case "loop": {
       const loopController = new LoopController(new RuntimeV2(), Number(subcmd) || 5);
       const loopResult = await loopController.execute(input || "hello");
