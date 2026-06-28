@@ -1,39 +1,43 @@
-name: Hive Determinism CI
+name: Hive Determinism Gate
 
 on:
-  push:
   pull_request:
+  push:
 
 jobs:
-  validate:
+  hive-ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install
         run: npm install
 
-      - name: Build CLI
+      - name: Build Hive
         run: npm run build
 
-      - name: Run Hive Determinism Test
-        id: hive
-        run: |
-          RESULT=$(node dist/cli/hive-cli.js validate "ci-test-input")
-          echo "$RESULT"
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
+      # 1. contract check
+      - name: Contract Validation
+        run: node dist/cli.js contract validate
 
-      - name: Enforce Determinism Gate
-        run: |
-          if [[ "${{ steps.hive.outputs.result }}" != *"DETERMINISTIC"* ]]; then
-            echo "❌ Determinism check failed"
-            exit 1
-          fi
-          echo "✅ Determinism validated"
+      # 2. determinism test
+      - name: Determinism Gate
+        run: node dist/cli.js validate "ci-test-input"
+
+      # 3. chaos regression
+      - name: Chaos Regression
+        run: node dist/cli.js chaos "ci-test-input" 500
+
+      # 4. stress validation
+      - name: Stress Gate
+        run: node dist/cli.js test "ci-test-input" 1000
+
+      # 5. enforce final gate
+      - name: Final Gate Check
+        run: node dist/cli.js ci gate

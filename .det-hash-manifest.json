@@ -1,0 +1,9 @@
+{
+  "runtimeVersion": "2.1.0",
+  "inputCanonicalizer": "v1",
+  "dagStrategy": "stable-toposort-v1",
+  "executionScheduler": "deterministic-queue-v1",
+  "traceFormat": "ordered-event-stream-v1",
+  "frozenAt": "2026-06-28T14:35:30.135Z",
+  "hash": "76acdc7870e81c74f9aa01a704ed6f0e5d992650112c3e5e9bcc3dde5c1cad85"
+}
