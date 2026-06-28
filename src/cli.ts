@@ -4,12 +4,12 @@
  * Hive CLI — Deterministic Runtime Verification CLI Tool (v2.2)
  * 
  * Usage:
- *   hive run <input>           Single execution
+ *   hive run <task>            Execute task with Runtime Core
+ *   hive agent list            List all agents
  *   hive test <input> [n]      Stress test (default n=1000)
  *   hive chaos <input> [n]     Chaos test
  *   hive validate <input>      Final verdict (CI-friendly)
  *   hive ci gate               CI Gate Aggregator
- *   hive ci diff               Baseline Compare Mode
  *   hive contract freeze       Freeze Determinism Contract
  *   hive contract validate     Validate Determinism Contract
  */
@@ -17,6 +17,7 @@
 import { validate, stress, chaos } from "./validate";
 import { CIGate } from "./ci/CIGate";
 import { ContractLock } from "./ci/ContractLock";
+import { RuntimeCore } from "./runtime-core";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -24,27 +25,41 @@ const input = process.argv[4];
 const n = Number(process.argv[5] || 1000);
 
 async function main() {
+  const runtime = new RuntimeCore();
+
   switch (cmd) {
     case "run": {
-      const res = await validate(input || "hello");
-      console.log(JSON.stringify(res, null, 2));
+      const result = await runtime.run(subcmd || "hello");
+      console.log(JSON.stringify(result, null, 2));
+      break;
+    }
+
+    case "agent": {
+      switch (subcmd) {
+        case "list":
+          console.log("Agents:", runtime.listAgents());
+          console.log("Tools:", runtime.listTools());
+          break;
+        default:
+          console.log("Usage: hive agent list");
+      }
       break;
     }
 
     case "test": {
-      const res = await stress(input || "hello", n);
+      const res = await stress(subcmd || "hello", n);
       console.log(JSON.stringify(res, null, 2));
       break;
     }
 
     case "chaos": {
-      const res = await chaos(input || "hello", n);
+      const res = await chaos(subcmd || "hello", n);
       console.log(JSON.stringify(res, null, 2));
       break;
     }
 
     case "validate": {
-      const res = await validate(input || "hello");
+      const res = await validate(subcmd || "hello");
       console.log(res.verdict);
 
       if (!res.deterministic) {
@@ -66,21 +81,8 @@ async function main() {
           break;
         }
 
-        case "diff": {
-          console.log("traceHash: MATCH");
-          console.log("proofHash: MATCH");
-          console.log("executionHash: MATCH");
-          console.log("");
-          console.log("=> NO REGRESSION DETECTED");
-          break;
-        }
-
         default:
-          console.log(`
-Hive CI Commands:
-  hive ci gate               CI Gate Aggregator
-  hive ci diff               Baseline Compare Mode
-          `);
+          console.log("Usage: hive ci gate");
       }
       break;
     }
@@ -101,7 +103,6 @@ Hive CI Commands:
 
           if (result.valid) {
             console.log("✔ Contract valid");
-            console.log(JSON.stringify(result.manifest, null, 2));
           } else {
             console.log("❌ Contract invalid:", result.error);
             process.exit(1);
@@ -110,34 +111,34 @@ Hive CI Commands:
         }
 
         default:
-          console.log(`
-Hive Contract Commands:
-  hive contract freeze       Freeze Determinism Contract
-  hive contract validate     Validate Determinism Contract
-          `);
+          console.log("Usage: hive contract freeze|validate");
       }
       break;
     }
 
     default:
       console.log(`
-Hive — Deterministic Runtime Verification CLI Tool (v2.2)
+Hive — Agent Runtime + Deterministic Verification CLI Tool
 
-Usage:
-  hive run <input>           Single execution
-  hive test <input> [n]      Stress test (default n=1000)
+Runtime Core Commands:
+  hive run <task>            Execute task with Runtime Core
+  hive agent list            List all agents
+
+Determinism Commands:
+  hive test <input> [n]      Stress test
   hive chaos <input> [n]     Chaos test
   hive validate <input>      Final verdict (CI-friendly)
+
+CI Commands:
   hive ci gate               CI Gate Aggregator
-  hive ci diff               Baseline Compare Mode
   hive contract freeze       Freeze Determinism Contract
   hive contract validate     Validate Determinism Contract
 
 Examples:
+  hive run "build a REST API"
+  hive agent list
   hive validate "hello"
-  hive test "hello" 500
   hive ci gate
-  hive contract freeze
       `);
   }
 }
