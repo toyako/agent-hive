@@ -1,0 +1,39 @@
+name: Hive Determinism CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build CLI
+        run: npm run build
+
+      - name: Run Hive Determinism Test
+        id: hive
+        run: |
+          RESULT=$(node dist/cli/hive-cli.js validate "ci-test-input")
+          echo "$RESULT"
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
+
+      - name: Enforce Determinism Gate
+        run: |
+          if [[ "${{ steps.hive.outputs.result }}" != *"DETERMINISTIC"* ]]; then
+            echo "❌ Determinism check failed"
+            exit 1
+          fi
+          echo "✅ Determinism validated"

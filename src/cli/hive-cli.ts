@@ -28,6 +28,7 @@ async function main() {
         async (canonicalInput) => ({ output: "validated", input: canonicalInput }),
         { runs: n }
       );
+      if (result.status !== "DETERMINISTIC") process.exitCode = 1;
       console.log(result.status === "DETERMINISTIC" 
         ? "DETERMINISTIC (PRODUCTION VALIDATED)" 
         : result.status === "PARTIALLY_DETERMINISTIC"
