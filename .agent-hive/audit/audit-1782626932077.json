@@ -1,0 +1,42 @@
+[
+  {
+    "type": "state_transition",
+    "taskId": "task-1782626922076-x2qb7q2i0",
+    "fromState": "DISCOVERED",
+    "toState": "QUEUED",
+    "reason": "Task discovered",
+    "id": "audit-1782626922076-o7d4c3dws",
+    "timestamp": 1782626922076,
+    "signature": "2d5d0adc95759a45"
+  },
+  {
+    "type": "state_transition",
+    "taskId": "task-1782626922079-ou6181rga",
+    "fromState": "DISCOVERED",
+    "toState": "QUEUED",
+    "reason": "Task discovered",
+    "id": "audit-1782626922080-blqzwbv0i",
+    "timestamp": 1782626922080,
+    "signature": "0482367e6247aeef"
+  },
+  {
+    "type": "state_transition",
+    "taskId": "task-1782626922080-hpd5do3zh",
+    "fromState": "DISCOVERED",
+    "toState": "QUEUED",
+    "reason": "Task discovered",
+    "id": "audit-1782626922080-38w4pj5qy",
+    "timestamp": 1782626922080,
+    "signature": "4d3f2739e932abf6"
+  },
+  {
+    "type": "state_transition",
+    "taskId": "task-1782626922080-hpd5do3zh",
+    "fromState": "QUEUED",
+    "toState": "RUNNING",
+    "reason": "Execution started",
+    "id": "audit-1782626922080-jjc8gt60q",
+    "timestamp": 1782626922080,
+    "signature": "103b7a7cab654501"
+  }
+]

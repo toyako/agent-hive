@@ -193,3 +193,19 @@ export {
   PlannerConfig,
   PlannerEngine
 } from "./planner/PlannerEngine";
+
+// Dashboard API
+export {
+  ApiResponse,
+  TaskStatusView,
+  CheckpointView,
+  DecisionRequest,
+  DecisionResponse,
+  AuditView,
+  DashboardApi
+} from "./dashboard/DashboardApi";
+
+export {
+  DashboardServerConfig,
+  DashboardServer
+} from "./dashboard/DashboardServer";
