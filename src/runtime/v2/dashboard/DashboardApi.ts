@@ -334,13 +334,28 @@ export class DashboardApi {
   // POST /api/runtime/checkpoint/:taskId/decide
   // ═══════════════════════════════════════════════════════════════
 
+  // 决策锁（防止并发冲突）
+  private decisionLocks: Map<string, boolean> = new Map();
+
   /**
-   * 远程人工干预
+   * 远程人工干预（带互斥锁）
    */
   async decideCheckpoint(
     taskId: string,
     decision: DecisionRequest
   ): Promise<ApiResponse<DecisionResponse>> {
+    // 🚨 终极不变量 1: 互斥锁防并发
+    if (this.decisionLocks.get(taskId)) {
+      return {
+        success: false,
+        error: `Decision in progress for task: ${taskId}. Please wait.`,
+        timestamp: Date.now()
+      };
+    }
+
+    // 获取锁
+    this.decisionLocks.set(taskId, true);
+
     try {
       const snapshot = this.checkpointManager.getCheckpoint(taskId);
       if (!snapshot) {
@@ -351,6 +366,7 @@ export class DashboardApi {
         };
       }
 
+      // 双重检查状态（防止重入）
       if (snapshot.status !== "pending") {
         return {
           success: false,
@@ -406,6 +422,9 @@ export class DashboardApi {
         error: String(error),
         timestamp: Date.now()
       };
+    } finally {
+      // 🚨 释放锁
+      this.decisionLocks.delete(taskId);
     }
   }
 

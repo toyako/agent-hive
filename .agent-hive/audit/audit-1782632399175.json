@@ -1,0 +1,34 @@
+[
+  {
+    "type": "state_transition",
+    "taskId": "task-1782632389172-yzxn6p6tq",
+    "fromState": "DISCOVERED",
+    "toState": "QUEUED",
+    "reason": "Task discovered",
+    "id": "audit-1782632389173-3gx2q5pgh",
+    "timestamp": 1782632389173,
+    "signature": "3f62d823f8a2edcf"
+  },
+  {
+    "type": "state_transition",
+    "taskId": "task-1782632389172-yzxn6p6tq",
+    "fromState": "QUEUED",
+    "toState": "RUNNING",
+    "reason": "Execution started",
+    "id": "audit-1782632389176-mw58j1c92",
+    "timestamp": 1782632389176,
+    "signature": "530bf1d85fcdcf6e"
+  },
+  {
+    "type": "human_decision",
+    "taskId": "task-1782632389172-yzxn6p6tq",
+    "operator": "user-0",
+    "reason": "Test",
+    "metadata": {
+      "decision": "approve"
+    },
+    "id": "audit-1782632389191-2wetrayrz",
+    "timestamp": 1782632389191,
+    "signature": "a781649619634268"
+  }
+]

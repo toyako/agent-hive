@@ -1,0 +1,25 @@
+{
+  "taskId": "task-1782632389172-yzxn6p6tq",
+  "status": "approved",
+  "createdAt": 1782632389176,
+  "updatedAt": 1782632389186,
+  "taskGoal": "Test task",
+  "taskState": "RUNNING",
+  "changes": {
+    "filesChanged": [
+      "test.js"
+    ],
+    "linesAdded": 10,
+    "linesRemoved": 5,
+    "summary": "Test changes"
+  },
+  "evaluatorResult": null,
+  "suspendReason": "Test suspend",
+  "recoveryHistory": [],
+  "humanDecision": {
+    "decision": "approve",
+    "reason": "Test",
+    "decidedAt": 1782632389186,
+    "decidedBy": "user-0"
+  }
+}
