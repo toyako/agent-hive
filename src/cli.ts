@@ -16,6 +16,7 @@ import { validate, stress, chaos } from "./validate";
 import { CIGate } from "./ci/CIGate";
 import { ContractLock } from "./ci/ContractLock";
 import { RuntimeV2 } from "./runtime-v2";
+import { LoopController } from "./loop-layer/LoopController";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -26,6 +27,13 @@ async function main() {
   const runtime = new RuntimeV2();
 
   switch (cmd) {
+    case "loop": {
+      const loopController = new LoopController(new RuntimeV2(), Number(subcmd) || 5);
+      const loopResult = await loopController.execute(input || "hello");
+      console.log(JSON.stringify(loopResult, null, 2));
+      break;
+    }
+
     case "run": {
       const result = await runtime.run(subcmd || "hello");
       console.log(JSON.stringify(result, null, 2));
