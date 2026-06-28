@@ -1,6 +1,6 @@
 {
   "name": "@toyako/agent-hive",
-  "version": "1.4.2",
+  "version": "2.0.0",
   "description": "Multi-Runtime Agent Orchestration Framework",
   "main": "dist/commands/cli.js",
   "bin": {
