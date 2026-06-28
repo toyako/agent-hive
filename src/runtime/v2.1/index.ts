@@ -48,3 +48,28 @@ export {
 // Re-export v2 components
 export { RuntimeCore } from "../v2/RuntimeCore";
 export { RuntimeQueue } from "../v2/queue/RuntimeQueue";
+
+// Validation
+export {
+  ValidationMetrics,
+  ValidationReport,
+  ValidationConfig,
+  ValidationEngine
+} from "./validation/ValidationEngine";
+
+export {
+  DashboardData,
+  ValidationDashboard
+} from "./validation/ValidationDashboard";
+
+export {
+  DivergenceType,
+  DivergenceDetail,
+  DivergenceAnalyzer
+} from "./validation/DivergenceAnalyzer";
+
+export {
+  CutoverStatus,
+  CutoverReport,
+  CutoverGate
+} from "./validation/CutoverGate";
