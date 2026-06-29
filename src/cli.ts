@@ -20,6 +20,7 @@ import { LoopController } from "./loop-layer/LoopController";
 import { SelfHealingRuntime } from "./self-healing/SelfHealingRuntime";
 import { ProductionRuntime } from "./production/ProductionRuntime";
 import { Platform } from "./platform";
+import { PlatformValidation } from "./platform/validation/PlatformValidation";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -30,6 +31,13 @@ async function main() {
   const runtime = new RuntimeV2();
 
   switch (cmd) {
+    case "validate-platform": {
+      const validation = new PlatformValidation();
+      const result = await validation.validate();
+      console.log(validation.generateReport(result));
+      break;
+    }
+
     case "server": {
       const platform = new Platform(Number(subcmd) || 3000);
       await platform.start();
