@@ -1,19 +1,19 @@
 ---
 name: Bug Report
-about: Report a bug in Agent Hive
+about: Report a bug to help us improve
 title: '[BUG] '
 labels: bug
+assignees: ''
 ---
 
-## Description
+## Bug Description
 
 A clear description of the bug.
 
 ## Steps to Reproduce
 
-1. Run `agent-hive ...`
-2. ...
-3. See error
+1. Run `hive ...`
+2. See error
 
 ## Expected Behavior
 
@@ -25,13 +25,10 @@ What actually happened.
 
 ## Environment
 
-- OS: [e.g., Ubuntu 22.04, macOS 14, Windows 11]
-- Node.js: [e.g., v22.0.0]
-- Agent Hive: [e.g., v3.0.0]
-- Runtime: [e.g., Claude, Codex, Hermes]
+- OS: [e.g., Ubuntu 22.04]
+- Node.js: [e.g., v20.0.0]
+- Agent Hive: [e.g., v4.0.0]
 
-## Logs
+## Additional Context
 
-```
-Paste any relevant logs here
-```
+Any other context about the problem.
