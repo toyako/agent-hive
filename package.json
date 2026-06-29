@@ -1,6 +1,6 @@
 {
   "name": "@toyako/hive",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "description": "Deterministic Runtime Verification CLI Tool",
   "main": "dist/index.js",
   "bin": {
