@@ -1,14 +1,23 @@
 /**
- * Kernel Module — v1.4-lite Kernel Patch
+ * Runtime Kernel v1
  * 
- * 最小可用 enforcement layer
- * 
- * 核心组件：
- * - KernelGate: 硬停止执行器
- * - ExecutionState: 执行状态机
- * - FailureInterceptor: 失败传播拦截器
+ * Agent Hive Runtime Kernel = A Deterministic DAG Execution Engine for AI-generated Software Systems
  */
 
-export { KernelGate, KernelPanicError } from "./KernelGate";
+// 旧的 kernel 模块
 export { ExecutionState, ExecutionContext } from "./ExecutionState";
 export { FailureInterceptor, NormalizedResult } from "./FailureInterceptor";
+export { KernelGate, KernelPanicError } from "./KernelGate";
+
+// 新的 Runtime Kernel
+export {
+  Blueprint,
+  ExecutionNode,
+  Edge,
+  TraceEvent,
+  Scheduler,
+  Executor,
+  RetryEngine,
+  TraceRecorder,
+  RuntimeKernel
+} from "./RuntimeKernel";
