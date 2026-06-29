@@ -19,6 +19,7 @@ import { RuntimeV2 } from "./runtime-v2";
 import { LoopController } from "./loop-layer/LoopController";
 import { SelfHealingRuntime } from "./self-healing/SelfHealingRuntime";
 import { ProductionRuntime } from "./production/ProductionRuntime";
+import { Platform } from "./platform";
 
 const cmd = process.argv[2];
 const subcmd = process.argv[3];
@@ -29,6 +30,13 @@ async function main() {
   const runtime = new RuntimeV2();
 
   switch (cmd) {
+    case "server": {
+      const platform = new Platform(Number(subcmd) || 3000);
+      await platform.start();
+      console.log("Server started at http://localhost:" + (Number(subcmd) || 3000));
+      break;
+    }
+
     case "production": {
       const prodRuntime = new ProductionRuntime();
       const result = await prodRuntime.execute(subcmd || "hello");
