@@ -1,0 +1,7 @@
+{
+  "name": "agent-hive-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "demo": "node index.js"
+  }
+}
