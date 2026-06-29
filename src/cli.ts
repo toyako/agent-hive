@@ -38,6 +38,11 @@ async function main() {
       break;
     }
 
+    case "demo": {
+      require("../examples/demo/index.js");
+      break;
+    }
+
     case "server": {
       const platform = new Platform(Number(subcmd) || 3000);
       await platform.start();

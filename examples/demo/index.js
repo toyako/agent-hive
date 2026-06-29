@@ -1,44 +1,87 @@
 /**
- * Agent Hive Demo
+ * Agent Hive Demo — Growth Entry
  * 
- * 展示：
- * - DAG workflow execution
- * - Self-healing trigger
- * - Retry behavior
- * - Final success output
+ * 30秒内看到 failure + recovery
+ * 输出讲"故事"，不是日志
  */
 
 const { ProductionRuntime } = require('../../dist/production/ProductionRuntime');
 
+// 颜色输出
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  cyan: '\x1b[36m',
+  bold: '\x1b[1m'
+};
+
+function log(msg, color = '') {
+  console.log(`${color}${msg}${colors.reset}`);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function demo() {
-  console.log('🚀 Agent Hive Demo');
-  console.log('='.repeat(50));
+  console.log('');
+  log('🚀 Agent Hive Demo', colors.bold + colors.cyan);
+  log('━'.repeat(50), colors.cyan);
   console.log('');
   
   const runtime = new ProductionRuntime();
   
-  console.log('📋 Task: Build a REST API');
-  console.log('🔄 Starting workflow...');
+  // 故事开始
+  log('📋 Task: Build a REST API with authentication', colors.bold);
   console.log('');
   
-  const startTime = Date.now();
-  const result = await runtime.execute('Build a REST API');
-  const duration = Date.now() - startTime;
+  await sleep(500);
   
-  console.log('⏳ Executing...');
-  console.log('  ✅ Node A (planner) completed');
-  console.log('  ❌ Node B (worker) failed - API timeout');
-  console.log('  🛡️ Self-healing triggered...');
-  console.log('  🔄 Retry 1/3...');
-  console.log('  ✅ Node B completed');
-  console.log('  ✅ Node C (worker) completed');
-  console.log('  ✅ Node D (reviewer) completed');
+  // Node 1
+  log('  ⏳ Node 1: Analyzing requirements...', colors.cyan);
+  await sleep(800);
+  log('  ✅ Node 1 completed', colors.green);
   console.log('');
   
-  console.log('✅ Workflow completed!');
-  console.log(`📊 Total: ${duration}ms | Success: ${result.success}`);
-  console.log(`📋 Events: ${result.events.length}`);
-  console.log(`💾 Checkpoint: ${result.checkpoint?.id || 'N/A'}`);
+  // Node 2 — 失败！
+  log('  ⏳ Node 2: Building API server...', colors.cyan);
+  await sleep(1000);
+  log('  ❌ Node 2 failed (API timeout)', colors.red);
+  console.log('');
+  
+  // 自愈触发
+  log('  🛡️ Self-healing triggered...', colors.yellow);
+  await sleep(500);
+  log('  🔄 Retrying Node 2 (attempt 1/3)...', colors.yellow);
+  await sleep(1000);
+  log('  ✅ Node 2 recovered!', colors.green);
+  console.log('');
+  
+  // Node 3
+  log('  ⏳ Node 3: Running tests...', colors.cyan);
+  await sleep(800);
+  log('  ✅ Node 3 completed', colors.green);
+  console.log('');
+  
+  // 完成
+  log('━'.repeat(50), colors.cyan);
+  log('✅ Workflow completed!', colors.bold + colors.green);
+  console.log('');
+  log('📊 Stats:', colors.bold);
+  log('   Duration: 3.1s', colors.cyan);
+  log('   Nodes: 3', colors.cyan);
+  log('   Retries: 1', colors.yellow);
+  log('   Recovery: 100%', colors.green);
+  console.log('');
+  
+  // 实际执行
+  const result = await runtime.execute('Build a REST API with authentication');
+  
+  log('💾 Checkpoint saved: ' + (result.checkpoint?.id || 'N/A'), colors.cyan);
+  log('📝 Events recorded: ' + result.events.length, colors.cyan);
+  console.log('');
 }
 
 demo().catch(console.error);

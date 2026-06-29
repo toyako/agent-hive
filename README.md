@@ -1,122 +1,57 @@
 # Agent Hive
 
-> A TypeScript-based AI workflow runtime with self-healing execution, DAG orchestration, and production-grade reliability.
+> Self-healing AI workflow runtime for unreliable AI systems.
 
-## What is Agent Hive?
+## The Problem
 
-Agent Hive is an open source AI workflow platform that makes it easy to build, run, and manage complex AI agent workflows with automatic recovery and self-healing capabilities.
+AI workflows break unpredictably in production environments.
 
-## Why it exists
+## The Solution
 
-- **AI workflow fragmentation**: Agents are hard to orchestrate
-- **Unreliable execution**: Workflows fail without recovery
-- **No production runtime**: No checkpoint, resume, or saga support
-- **Complex setup**: Too much configuration required
+Agent Hive automatically detects failures and recovers workflows.
 
-## Features
-
-- 🔄 **Workflow Orchestration**: DAG-based multi-agent execution
-- 🛡️ **Self-Healing**: Automatic failure detection and recovery
-- 💾 **Checkpoint & Resume**: Save and restore execution state
-- 🔌 **Plugin System**: Extend without modifying core
-- 📊 **Observability**: Metrics, logs, and traces
-- 🚀 **Production Ready**: Battle-tested reliability
-
-## Quick Start (5 minutes)
+## Try it in 30 seconds
 
 ```bash
-# Install
-npm install -g @toyako/hive
-
-# Run your first workflow
-hive run "build a REST API"
-
-# Start the API server
-hive server
+npx hive run demo
 ```
 
-## Example Output
+## What you'll see
 
 ```
-$ hive run "build a REST API"
-
-🚀 Starting workflow...
-📋 Task: build a REST API
-🔄 DAG: 4 nodes (A → B,C → D)
-
-⏳ Executing Node A (hermes)...
-✅ Node A completed (12ms)
-
-⏳ Executing Node B (worker)...
-❌ Node B failed (API timeout)
-🛡️ Self-healing triggered...
-🔄 Retry 1/3...
-✅ Node B completed (45ms)
-
-⏳ Executing Node C (worker)...
-✅ Node C completed (23ms)
-
-⏳ Executing Node D (reviewer)...
-✅ Node D completed (8ms)
+🚀 Building API workflow...
+  ⏳ Node 1: Analyzing requirements...
+  ✅ Node 1 completed
+  ⏳ Node 2: Building API...
+  ❌ Node 2 failed (API timeout)
+  🛡️ Self-healing triggered...
+  🔄 Retrying Node 2...
+  ✅ Node 2 recovered
+  ⏳ Node 3: Running tests...
+  ✅ Node 3 completed
 
 ✅ Workflow completed!
-📊 Total: 88ms | Nodes: 4 | Retries: 1
+📊 Duration: 2.1s | Nodes: 3 | Retries: 1
 ```
 
-## Architecture (Simplified)
+## Why it matters
 
-```
-User → CLI/API → Runtime → Workflow → Result
-                   ↓
-              Self-Healing
-                   ↓
-              Checkpoint
-```
+- 🔄 **Retries automatically** — no manual intervention
+- 🛡️ **Recovers failures** — keeps workflows running
+- ⚡ **Production ready** — checkpoint, resume, saga
 
-## Use Cases
-
-- **AI Workflow Automation**: Orchestrate multi-step AI tasks
-- **API Orchestration**: Chain multiple API calls with recovery
-- **Self-Healing Pipelines**: Automatic failure recovery
-- **Multi-Agent Systems**: Coordinate multiple AI agents
-
-## Documentation
-
-- [Quick Start](docs/quickstart.md)
-- [Architecture](docs/architecture/overview.md)
-- [API Reference](docs/api/)
-- [SDK Guide](docs/sdk/)
-- [Plugin Guide](docs/plugins/)
-
-## Examples
+## Install
 
 ```bash
-# Basic workflow
-npm run example:basic
-
-# Self-healing demo
-npm run example:self-healing
-
-# API server
-npm run example:api
+npm install -g @toyako/hive
 ```
 
-## Stability
+## Next Steps
 
-- ✅ Stress Test: 1167 ops/s
-- ✅ Chaos Test: 100% recovery rate
-- ✅ Security: 0 vulnerabilities
-
-See [Stability Report](docs/stability.md) for details.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+- [Quick Start](docs/quickstart.md)
+- [Examples](examples/)
+- [API Reference](docs/api/)
 
 ## License
 
 MIT
-
----
-
-**Agent Hive** — Production-ready, developer-friendly open source AI workflow platform.
